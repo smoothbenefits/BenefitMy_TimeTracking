@@ -1,4 +1,3 @@
-node_modules
 lib
 *.log
 /public/scripts/bundle.js
