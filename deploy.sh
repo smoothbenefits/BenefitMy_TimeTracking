@@ -3,14 +3,13 @@
 echo "Start npm install..."
 sudo npm install
 
-echo "Backup GIT ignore file..."
-mv ./.gitignore ./.gitignore_backup
-
-echo "Apply GIT ignore file for deployment..."
-mv ./.gitignore_deploy ./.gitignore
+echo "Package up artifacts..."
+zip ./buildartifact.zip -r * .[^.]*
 
 echo "Running eb deploy..." 
+eb deploy
 
-echo "Resume GIT ignore file..."
-mv ./.gitignore ./.gitignore_deploy
-mv ./.gitignore_backup ./.gitignore
+echo "Cleanup packages..."
+rm ./buildartifact.zip
+
+echo "The deployment has been completed!"
