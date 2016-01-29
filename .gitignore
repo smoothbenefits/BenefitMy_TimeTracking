@@ -5,3 +5,8 @@ lib
 /public/scripts/bundle.min.js
 /public/scripts-es6/bundle.js
 /public/scripts-es6/bundle.min.js
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
