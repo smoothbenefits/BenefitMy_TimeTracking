@@ -35,3 +35,13 @@ Database:
 - Connection URI. See ./config/db.js
     - For deployment on Elastic Beanstalk, the configuration would automatically pull the URI stored in the envrionment variable.
     - For local development, the configuration would use the default one pointing at local running MongoDb server
+
+Plan for Next Step:
+
+- Deploy to different environments via CLI
+    - Create test and production (and optionally, staging) environments in EB for the application
+    - Set environment variables for each environment
+        - MongoDB URI
+    - Setup git branches to match all the environments
+    - Setup git branch to environment linkages via EB CLI
+- Then, eventually look at EB integration with CircleCI (or any CI options works well with EB and GitHub)
