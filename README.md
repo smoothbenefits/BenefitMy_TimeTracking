@@ -11,7 +11,7 @@ System Requirements:
     - See config\server.js for assumed server configurations
     - If permission issue encountered, try with sudo
 
-Deployment: (Work in Progress. Don't use yet!)
+Deployment:
 
 - One time setup
     - Prerequsite: Install Elastic Beanstalk CLI
@@ -28,4 +28,10 @@ Deployment: (Work in Progress. Don't use yet!)
     - Go to the AWS console and monitor the status of Elastic Beanstalk
     - Hit /livecheck to make sure the service is live
 
+Database:
 
+- We chose to use the hosted MongoDB service provided by MongoLab
+    - https://mongolab.com/
+- Connection URI. See ./config/db.js
+    - For deployment on Elastic Beanstalk, the configuration would automatically pull the URI stored in the envrionment variable.
+    - For local development, the configuration would use the default one pointing at local running MongoDb server
