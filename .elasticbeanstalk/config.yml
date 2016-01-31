@@ -1,6 +1,10 @@
 branch-defaults:
   master:
+    environment: timetracking-prd
+  development:
     environment: timetracking-dev
+  release-0.1.0:
+    environment: timetracking-stg
 global:
   application_name: TimeTrackingService
   default_ec2_keyname: null

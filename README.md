@@ -27,6 +27,25 @@ Deployment:
         - "The deployment has been completed!"
     - Go to the AWS console and monitor the status of Elastic Beanstalk
     - Hit /livecheck to make sure the service is live
+- Deploy to different environments
+    - To Dev
+        - Checkout to "development" git branch
+        - Make sure to sync with the remote branch
+        - Make sure to be clear with any local changes
+        - Run the above routine steps to deploy
+    - To Staging
+        - Once the release-X.Y.Z branch is created for this release, checkout to the branch locally
+        - Make sure to sync with the remote branch
+        - Make sure to be clear with any local changes
+        - Update the 'branch-defaults' section of ./.elasticbeanstalk/config.yml file
+            - Set the git branch corresponding to the "timetracking-stg" environment to the new release-X.Y.Z branch
+        - Push the changes to ./.elasticbeanstalk/config.yml to remote
+        - Run the above routine steps to deploy
+    - To Production
+        - Checkout to "master" git branch
+        - Make sure to sync with the remote branch
+        - Make sure to be clear with any local changes
+        - Run the above routine steps to deploy 
 
 Database:
 
