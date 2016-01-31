@@ -11,6 +11,16 @@ System Requirements:
     - See config\server.js for assumed server configurations
     - If permission issue encountered, try with sudo
 
+Development Process:
+
+- Use Git Flow
+    - https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow 
+- Git branches:
+    - development branch. The default branch. All feature branches should be off of this. 
+    - master branch. The "production" branch. Host of the "released" code base.
+    - release-X.Y.Z branch. Branches that are created to release a batch of deliverables from development to master. It should be off of development, and should be merged to master, and back-merge to development when release is concluded.
+    - Feature branches. Branches off of development branch. One for each feature/ticket. Should be merged to development branch once concluded. 
+
 Deployment:
 
 - One time setup
