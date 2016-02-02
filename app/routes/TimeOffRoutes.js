@@ -1,55 +1,55 @@
-var Pto = require('../models/pto');
+var Timeoff = require('../models/timeoff');
 
 module.exports = function(app) {
 
-    app.get('/api/v1/requestor/:token/ptos', function(req, res) {
+    app.get('/api/v1/requestor/:token/timeoffs', function(req, res) {
         var token = req.params.token;
-        Pto
+        Timeoff
         .find({'requestor.foreignKey':token})
         .sort('timestamp')
-        .exec(function(err, ptos){
+        .exec(function(err, timeoffs){
             if (err) {
                 res.send(err);
             }
 
             res.setHeader('Cache-Control', 'no-cache');
-            res.json(ptos);
+            res.json(timeoffs);
         });
 
     });
 
-    app.get('/api/v1/approver/:token/ptos', function(req, res) {
+    app.get('/api/v1/approver/:token/timeoffs', function(req, res) {
         var token = req.params.token;
-        Pto
+        Timeoff
         .find({'approver.foreignKey':token})
         .sort('timestamp')
-        .exec(function(err, ptos){
+        .exec(function(err, timeoffs){
             if (err) {
                 res.send(err);
             }
 
             res.setHeader('Cache-Control', 'no-cache');
-            res.json(ptos);
+            res.json(timeoffs);
         });
 
     });
 
-    app.post('/api/v1/pto', function(req, res) {
+    app.post('/api/v1/timeoff', function(req, res) {
 
-        Pto.create(req.body, function(err, createdPto) {
+        Timeoff.create(req.body, function(err, createdTimeOff) {
             if (err) {
                 res.send(err);
             }
 
-            Pto
-            .findById(createdPto._id)
-            .exec(function(err, pto) {
+            Timeoff
+            .findById(createdTimeOff._id)
+            .exec(function(err, timeoff) {
                 if (err) {
                     res.send(err);
                 }
 
                 res.setHeader('Cache-Control', 'no-cache');
-                res.json(pto);
+                res.json(timeoff);
             });
         });
     
