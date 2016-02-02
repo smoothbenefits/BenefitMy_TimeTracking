@@ -3,7 +3,7 @@ var Schema = mongoose.Schema;
 
 module.exports = mongoose.model('Pto', {
     startDateTime: {type: Date, default: Date.now},
-    length: Number,
+    duration: Number,
     status: String,
     requestor: {  email : String,
         firstName: String,
