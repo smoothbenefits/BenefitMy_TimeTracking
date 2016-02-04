@@ -6,7 +6,7 @@ module.exports = function(app) {
         var token = req.params.token;
         Timeoff
         .find({'requestor.personDescriptor':token})
-        .sort('timestamp')
+        .sort('requestTimestamp')
         .exec(function(err, timeoffs){
             if (err) {
                 res.send(err);
@@ -22,7 +22,7 @@ module.exports = function(app) {
         var token = req.params.token;
         Timeoff
         .find({'approver.personDescriptor':token})
-        .sort('timestamp')
+        .sort('requestTimestamp')
         .exec(function(err, timeoffs){
             if (err) {
                 res.send(err);
