@@ -5,7 +5,7 @@ module.exports = function(app) {
     app.get('/api/v1/requestor/:token/timeoffs', function(req, res) {
         var token = req.params.token;
         Timeoff
-        .find({'requestor.foreignKey':token})
+        .find({'requestor.personDescriptor':token})
         .sort('timestamp')
         .exec(function(err, timeoffs){
             if (err) {
@@ -21,7 +21,7 @@ module.exports = function(app) {
     app.get('/api/v1/approver/:token/timeoffs', function(req, res) {
         var token = req.params.token;
         Timeoff
-        .find({'approver.foreignKey':token})
+        .find({'approver.personDescriptor':token})
         .sort('timestamp')
         .exec(function(err, timeoffs){
             if (err) {
