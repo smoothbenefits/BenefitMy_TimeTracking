@@ -42,7 +42,23 @@ module.exports = function(app) {
             }
 
             res.json(createdTimeOff);
-            });
-        }
-    );
+        });
+    });
+
+    app.put('/api/v1/timeoffs/:id', function(req, res){
+        var id = req.params.id;
+        var status = req.body.status;
+        Timeoff
+        .findOneAndUpdate({'_id': id}, 
+                          { $set: { status: status, decisionTimestamp: Date.now()}}, 
+                          {}, 
+                          function(err, timeoff){
+            if (err) {
+                res.send(err);
+            }
+
+            res.setHeader('Cache-Control', 'no-cache');
+            res.json(timeoff);
+        });
+    });
 };
