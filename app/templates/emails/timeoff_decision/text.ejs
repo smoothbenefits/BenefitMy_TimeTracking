@@ -1,7 +1,6 @@
-Timeoff Request for '<%= request.requestor.firstName %> <%= request.requestor.lastName %>' is pending your decision.
+Your timeoff request status has been updated to: <b><%= request.status %>
 
-First Name: <%= request.requestor.firstName %>
-Last Name: <%= request.requestor.lastName %>
+Approver: <%= request.approver.firstName %> <%= request.approver.lastName %>
 Request Type: <%= request.type %>
 Status: <%= request.status %>
 Start Time: <%= request.startDateTimeForDisplay %>

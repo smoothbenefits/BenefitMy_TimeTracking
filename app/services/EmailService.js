@@ -3,6 +3,7 @@ var appSettings = require('../settings/appSettings');
 var path = require('path');
 var emailTemplates = require('email-templates');
 var templatesDir = path.resolve(__dirname, '..', 'templates/emails');
+var commonUtilityService = require('./CommonUtilityService');
 
 // This is the SMTP configuration to be used by node-mailer
 var smtpConfig = {
@@ -93,7 +94,37 @@ var sendSupportEmailWithTemplate = function(
     });
 };
 
+var sendTimeoffRequestEmail = function(requestModel) {
+    sendSupportEmailWithTemplate(
+        [requestModel.approver.email],
+        '[Action Required]Timeoff Request Pending',
+        'timeoff_request',
+        createMailContextFromTimeoffRequestModel(requestModel)
+    );
+};
+
+var sendTimeoffDecisionEmail = function(requestModel) {
+    sendSupportEmailWithTemplate(
+        [requestModel.requestor.email],
+        '[Notice]Timeoff Request Decision Made',
+        'timeoff_decision',
+        createMailContextFromTimeoffRequestModel(requestModel)
+    );
+};
+
+var createMailContextFromTimeoffRequestModel = function(requestModel) {
+    requestModel.startDateTimeForDisplay = 
+        commonUtilityService.getDisplayDateTime(requestModel.startDateTime);
+    return {
+        request: requestModel
+    };
+};
+
 module.exports = {
     sendSupportEmail: sendSupportEmail,
-    sendSupportEmailWithTemplate: sendSupportEmailWithTemplate
+    sendSupportEmailWithTemplate: sendSupportEmailWithTemplate,
+
+    // Timeoff emails
+    sendTimeoffRequestEmail: sendTimeoffRequestEmail,
+    sendTimeoffDecisionEmail: sendTimeoffDecisionEmail
 };

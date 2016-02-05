@@ -1,4 +1,5 @@
 var Timeoff = require('../models/timeoff');
+var emailService = require('../services/EmailService')
 
 module.exports = function(app) {
 
@@ -40,6 +41,9 @@ module.exports = function(app) {
             if (err) {
                 res.send(err);
             }
+
+            // Send notification email
+            emailService.sendTimeoffRequestEmail(createdTimeOff);
 
             Timeoff
             .findById(createdTimeOff._id)

@@ -1,0 +1,19 @@
+a {
+    background:#6EBE4B;
+    color:#FFF;
+    font-weight:700;
+    border: 1px solid #56A245;
+    border-radius: 0;
+    padding: 10px 6px; 
+    width: 150px;
+    text-align: center;
+    box-shadow: none;
+    text-shadow: none;
+    line-height: 15px;
+    display: inline-block;
+    margin-bottom: 0;
+    vertical-align: middle;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 13px;    
+}
