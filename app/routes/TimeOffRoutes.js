@@ -41,17 +41,8 @@ module.exports = function(app) {
                 res.send(err);
             }
 
-            Timeoff
-            .findById(createdTimeOff._id)
-            .exec(function(err, timeoff) {
-                if (err) {
-                    res.send(err);
-                }
-
-                res.setHeader('Cache-Control', 'no-cache');
-                res.json(timeoff);
+            res.json(createdTimeOff);
             });
-        });
-    
-    });
+        }
+    );
 };
