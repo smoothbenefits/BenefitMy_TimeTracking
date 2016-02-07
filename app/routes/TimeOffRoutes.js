@@ -34,7 +34,7 @@ module.exports = function(app) {
 
     });
 
-    app.post('/api/v1/timeoff', function(req, res) {
+    app.post('/api/v1/timeoffs', function(req, res) {
 
         Timeoff.create(req.body, function(err, createdTimeOff) {
             if (err) {
@@ -45,7 +45,7 @@ module.exports = function(app) {
         });
     });
 
-    app.put('/api/v1/timeoffs/:id', function(req, res){
+    app.put('/api/v1/timeoffs/:id/status', function(req, res){
         var id = req.params.id;
         var status = req.body.status;
         Timeoff
