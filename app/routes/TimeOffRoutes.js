@@ -34,7 +34,7 @@ module.exports = function(app) {
 
     });
 
-    app.post('/api/v1/timeoff', function(req, res) {
+    app.post('/api/v1/timeoffs', function(req, res) {
 
         Timeoff.create(req.body, function(err, createdTimeOff) {
             if (err) {
@@ -42,7 +42,23 @@ module.exports = function(app) {
             }
 
             res.json(createdTimeOff);
-            });
-        }
-    );
+        });
+    });
+
+    app.put('/api/v1/timeoffs/:id/status', function(req, res){
+        var id = req.params.id;
+        var status = req.body.status;
+        Timeoff
+        .findOneAndUpdate({'_id': id}, 
+                          { $set: { status: status, decisionTimestamp: Date.now()}}, 
+                          {}, 
+                          function(err, timeoff){
+            if (err) {
+                res.send(err);
+            }
+
+            res.setHeader('Cache-Control', 'no-cache');
+            res.json(timeoff);
+        });
+    });
 };
