@@ -6,10 +6,7 @@ module.exports = {
         emailHostPassword: 'BenefitMy2015',
         emailPort: 587,
         emailUseTls: true,
-
-        // TODO: Put in the real support email once the feature is 
-        //       ready
-        appSupportEmailAddress: 'jeff.zhang.82@gmail.com'
+        appSupportEmailAddress: 'support@workbenefits.me'
     },
 
     mainAppSiteUrl : 'http://app.workbenefits.me/'

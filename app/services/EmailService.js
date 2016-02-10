@@ -54,6 +54,7 @@ var sendSupportEmail = function(
         if(error){
             // TODO: log error
             console.log(error);
+            return;
         }
     });
 };
@@ -70,6 +71,7 @@ var sendSupportEmailWithTemplate = function(
         if (err) {
             // TODO: log error
             console.log(err);
+            return;
         }
 
         // Add main site URL to the context
@@ -79,6 +81,7 @@ var sendSupportEmailWithTemplate = function(
             if (err) {
                 // TODO: log error
                 console.log(err);
+                return;
             }
 
             // Now we have the rendered html and text, use the normal 
@@ -114,7 +117,7 @@ var sendTimeoffDecisionEmail = function(requestModel) {
 
 var createMailContextFromTimeoffRequestModel = function(requestModel) {
     requestModel.startDateTimeForDisplay = 
-        commonUtilityService.getDisplayDateTime(requestModel.startDateTime);
+        commonUtilityService.getDisplayDate(requestModel.startDateTime);
     return {
         request: requestModel
     };
