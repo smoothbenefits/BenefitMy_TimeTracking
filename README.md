@@ -42,6 +42,10 @@ Deployment:
         - Push the changes to ./.elasticbeanstalk/config.yml to remote
         - Run the above routine steps to deploy
     - To Production
+        - Once the release-X.Y.Z is tested in staging
+            - Merge the branch to master
+            - Tag the master branch with the release number
+            - Merge the branch back to development
         - Checkout to "master" git branch
         - Make sure to sync with the remote branch
         - Make sure to be clear with any local changes
