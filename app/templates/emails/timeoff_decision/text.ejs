@@ -1,0 +1,11 @@
+Your timeoff request status has been updated to: <b><%= request.status %>
+
+Approver: <%= request.approver.firstName %> <%= request.approver.lastName %>
+Request Type: <%= request.type %>
+Status: <%= request.status %>
+Start Time: <%= request.startDateTimeForDisplay %>
+Duration (hours): <%= request.duration %>
+
+---------------------------------------------------------------------------
+
+Login to View This Request: <%= mainSiteUrl %>

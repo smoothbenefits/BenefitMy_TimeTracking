@@ -1,3 +1,4 @@
+var emailService = require('../services/EmailService')
 var Timeoff = require('../models/timeoff');
 
 module.exports = function(app) {
@@ -41,6 +42,9 @@ module.exports = function(app) {
                 res.send(err);
             }
 
+            // Send notification email
+            emailService.sendTimeoffRequestEmail(createdTimeOff);
+
             res.json(createdTimeOff);
         });
     });
@@ -56,6 +60,9 @@ module.exports = function(app) {
             if (err) {
                 res.send(err);
             }
+
+            // Send notification email
+            emailService.sendTimeoffDecisionEmail(timeoff);
 
             res.setHeader('Cache-Control', 'no-cache');
             res.json(timeoff);

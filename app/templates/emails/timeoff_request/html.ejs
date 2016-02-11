@@ -1,0 +1,21 @@
+<html>
+    <head>
+    </head>
+    <body>
+      <h3>Timeoff request for '<%= request.requestor.firstName %> <%= request.requestor.lastName %>' is pending your decision.</h3>
+      <br/>
+      <div>Details:</div>
+      <ul>
+        <li>First Name: <b><%= request.requestor.firstName %></b></li>
+        <li>Last Name: <b><%= request.requestor.lastName %></b></li>
+        <li>Request Type: <b><%= request.type %></b></li>
+        <li>Status: <b><%= request.status %></b></li>
+        <li>Start Time: <b><%= request.startDateTimeForDisplay %></b></li>
+        <li>Duration (hours): <b><%= request.duration %></b></li>
+      </ul>
+      <br/>
+      <hr/>
+
+      <a href="<%= mainSiteUrl %>">Login to Process This Request</a>
+    </body>
+</html>
