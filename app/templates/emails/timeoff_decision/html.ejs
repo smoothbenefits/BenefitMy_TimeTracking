@@ -1,0 +1,20 @@
+<html>
+    <head>
+    </head>
+    <body>
+      <h3>Your timeoff request status has been updated to: <b><%= request.status %></b></h3>
+      <br/>
+      <div>Details:</div>
+      <ul>
+        <li>Approver: <b><%= request.approver.firstName %> <%= request.approver.lastName %></b></li>
+        <li>Request Type: <b><%= request.type %></b></li>
+        <li>Status: <b><%= request.status %></b></li>
+        <li>Start Time: <b><%= request.startDateTimeForDisplay %></b></li>
+        <li>Duration (hours): <b><%= request.duration %></b></li>
+      </ul>
+      <br/>
+      <hr/>
+
+      <a href="<%= mainSiteUrl %>">Login to View This Request</a>
+    </body>
+</html>
