@@ -12,6 +12,10 @@ module.exports = mongoose.model('WorkTimeSheet', {
         personDescriptor: { 
             type: String, 
             required: true
+        },
+        companyDescriptor: { 
+            type: String, 
+            required: true
         }
     },
     workHours: {
