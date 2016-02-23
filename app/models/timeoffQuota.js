@@ -10,6 +10,6 @@ module.exports = mongoose.model('TimeoffQuota', {
         sickDaysInHours: Number,
         paidTimeOffInHours: Number
     },
-    createdTimestamp: { type: Date, default: Date.now },
-    modifiedTimestamp: { type: Date }
+    createdTimestamp: { type: Date },
+    modifiedTimestamp: { type: Date, default: Date.now }
 });

@@ -18,7 +18,6 @@ module.exports = function(app) {
 
     app.post('/api/v1/timeoff_quota', function(req, res) {
         var descriptor = req.body.personDescriptor;
-        req.body.modifiedTimestamp = new Date();
         TimeoffQuota.findOneAndUpdate(   
             {personDescriptor: descriptor},
             req.body,
