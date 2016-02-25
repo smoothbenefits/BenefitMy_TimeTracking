@@ -7,7 +7,7 @@ module.exports = mongoose.model('TimeoffQuota', {
         required: true
     },
     quota:{
-        sickDaysInHours: Number,
+        sickTimeInHours: Number,
         paidTimeOffInHours: Number
     },
     createdTimestamp: { type: Date },
