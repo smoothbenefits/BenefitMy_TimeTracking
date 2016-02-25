@@ -16,7 +16,7 @@ module.exports = function(app) {
         });
     });
 
-    app.post('/api/v1/timeoff_quota', function(req, res) {
+    app.post('/api/v1/timeoff_quotas', function(req, res) {
         var descriptor = req.body.personDescriptor;
         TimeoffQuota.findOneAndUpdate(   
             {personDescriptor: descriptor},
