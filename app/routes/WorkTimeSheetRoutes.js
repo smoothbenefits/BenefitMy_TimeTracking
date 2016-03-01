@@ -36,7 +36,7 @@ module.exports = function(app) {
         .sort('weekStartDate')
         .exec(function(err, entries){
             if (err) {
-                res.send(err);
+                res.status(400).send(err);
             }
 
             res.setHeader('Cache-Control', 'no-cache');
@@ -59,7 +59,7 @@ module.exports = function(app) {
         .sort('weekStartDate')
         .exec(function(err, entries){
             if (err) {
-                res.send(err);
+                res.status(400).send(err);
             }
 
             res.setHeader('Cache-Control', 'no-cache');
@@ -80,7 +80,7 @@ module.exports = function(app) {
         .sort('weekStartDate')
         .exec(function(err, entries){
             if (err) {
-                res.send(err);
+                res.status(400).send(err);
             }
 
             res.setHeader('Cache-Control', 'no-cache');
@@ -92,10 +92,27 @@ module.exports = function(app) {
 
         WorkTimeSheet.create(req.body, function(err, createdEntry) {
             if (err) {
-                res.send(err);
+                res.status(400).send(err);
             }
 
             res.json(createdEntry);
+        });
+    });
+
+    app.put('/api/v1/work_timesheets/:id', function(req, res){
+        var id = req.params.id;
+        var newTimesheet = req.body
+        newTimesheet.id = null;
+        WorkTimeSheet
+        .findOneAndUpdate(
+            {_id:id},
+            newTimesheet,
+            function(err, updatedTimesheet){
+                if (err){
+                    res.status(400).send(err);
+                }
+                res.setHeader('Cache-Control', 'no-cache');
+                res.json(updatedTimesheet);
         });
     });
 };
