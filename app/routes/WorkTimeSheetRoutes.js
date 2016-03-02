@@ -102,7 +102,7 @@ module.exports = function(app) {
     app.put('/api/v1/work_timesheets/:id', function(req, res){
         var id = req.params.id;
         var newTimesheet = req.body
-        newTimesheet.id = null;
+        newTimesheet.updatedTimestamp = Date.now();
         WorkTimeSheet
         .findOneAndUpdate(
             {_id:id},
