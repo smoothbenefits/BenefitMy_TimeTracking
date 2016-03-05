@@ -27,6 +27,15 @@ module.exports = mongoose.model('WorkTimeSheet', {
         friday: { type: Number, required: true },
         saturday: { type: Number, required: true }
     },
+    overtimeHours: {
+        sunday: { type: Number, default: 0 },
+        monday: { type: Number, default: 0  },
+        tuesday: { type: Number, default: 0  },
+        wednesday: { type: Number, default: 0  },
+        thursday: { type: Number, default: 0  },
+        friday: { type: Number, default: 0  },
+        saturday: { type: Number, default: 0  }
+    },
     createdTimestamp: { type: Date, default: Date.now },
     updatedTimestamp: { type: Date, default: Date.now }
 });
