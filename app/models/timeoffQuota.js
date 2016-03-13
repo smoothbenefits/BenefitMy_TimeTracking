@@ -6,10 +6,15 @@ module.exports = mongoose.model('TimeoffQuota', {
         type: String, 
         required: true
     },
-    quota:{
-        sickTimeInHours: Number,
-        paidTimeOffInHours: Number
-    },
+    quotaInfoCollection:[{
+        timeoffType: { type: String, required: true },
+        bankedHours: { type: Number, default: 0 },
+        annualTargetHours: { type: Number, default: 0 },
+        accrualSpecs: {
+            accrualStartDate: { type: Date, required: true },
+            accrualFrequency: { type: String, required: true }
+        }
+    }],
     createdTimestamp: { type: Date },
     modifiedTimestamp: { type: Date, default: Date.now }
 });
