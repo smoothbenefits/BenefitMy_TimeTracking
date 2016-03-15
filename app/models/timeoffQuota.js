@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-module.exports = mongoose.model('TimeoffQuota', {
+var TimeoffQuotaSchema = new Schema({
     personDescriptor:{ 
         type: String, 
         required: true
@@ -11,10 +11,18 @@ module.exports = mongoose.model('TimeoffQuota', {
         bankedHours: { type: Number, default: 0 },
         annualTargetHours: { type: Number, default: 0 },
         accrualSpecs: {
-            accrualStartDate: { type: Date, required: true },
-            accrualFrequency: { type: String, required: true }
+            accrualFrequency: { type: String, required: true },
+            accruedHours: { type: Number, default: 0 }
         }
     }],
     createdTimestamp: { type: Date },
     modifiedTimestamp: { type: Date, default: Date.now }
 });
+
+// Override toJSON to inject custom logic
+TimeoffQuotaSchema.methods.toJSON = function() {
+  var obj = this.toObject();
+  return obj;
+};
+
+module.exports = mongoose.model('TimeoffQuota', TimeoffQuotaSchema);

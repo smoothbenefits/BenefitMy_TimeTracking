@@ -1,5 +1,23 @@
 var emailService = require('../services/EmailService')
-var Timeoff = require('../models/timeoff');
+var Timeoff = require('../models/timeoff'); 
+var TimeoffQuota = require('../models/timeoffQuota');
+
+var applyApprovedRequestToBankedBalance = function(timeoffRequest) {
+    if (timeoffRequest.status != 'APPROVED') {
+        return;
+    }
+
+    TimeoffQuota
+    .findOneAndUpdate({
+                        'personDescriptor': timeoffRequest.requestor.personDescriptor,
+                        'quotaInfoCollection.timeoffType': timeoffRequest.type
+                      }, 
+                      { $inc: { 'quotaInfoCollection.$.bankedHours': -timeoffRequest.duration }}, 
+                      {}, 
+                      function(err, timeoffQuota) {
+        // TODO: Add logging
+    });
+};
 
 module.exports = function(app) {
 
@@ -60,6 +78,9 @@ module.exports = function(app) {
             if (err) {
                 res.send(err);
             }
+
+            // Apply to the user's available balance.
+            applyApprovedRequestToBankedBalance(timeoff);
 
             // Send notification email
             emailService.sendTimeoffDecisionEmail(timeoff);
