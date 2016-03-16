@@ -19,10 +19,4 @@ var TimeoffQuotaSchema = new Schema({
     modifiedTimestamp: { type: Date, default: Date.now }
 });
 
-// Override toJSON to inject custom logic
-TimeoffQuotaSchema.methods.toJSON = function() {
-  var obj = this.toObject();
-  return obj;
-};
-
 module.exports = mongoose.model('TimeoffQuota', TimeoffQuotaSchema);
