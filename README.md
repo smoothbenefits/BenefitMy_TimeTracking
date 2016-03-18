@@ -52,10 +52,14 @@ Deployment:
         - Push the changes to ./.elasticbeanstalk/config.yml to remote
         - Run the above routine steps to deploy
     - To Production
+        - Once the release-X.Y.Z is tested in staging
+            - Merge the branch to master
+            - In Github, create a release and tag it with the release number "vX.Y.Z"
         - Checkout to "master" git branch
         - Make sure to sync with the remote branch
         - Make sure to be clear with any local changes
-        - Run the above routine steps to deploy 
+        - Run the above routine steps to deploy to AWS
+        - Merge the release-X.Y.Z branch back to development 
 
 Database:
 
