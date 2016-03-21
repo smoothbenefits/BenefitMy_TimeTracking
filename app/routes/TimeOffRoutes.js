@@ -1,4 +1,5 @@
-var emailService = require('../services/EmailService')
+var emailService = require('../services/EmailService');
+var TimeoffAccrualService = require('../services/TimeoffAccrualService');
 var Timeoff = require('../models/timeoff'); 
 var TimeoffQuota = require('../models/timeoffQuota');
 
@@ -7,16 +8,11 @@ var applyApprovedRequestToBankedBalance = function(timeoffRequest) {
         return;
     }
 
-    TimeoffQuota
-    .findOneAndUpdate({
-                        'personDescriptor': timeoffRequest.requestor.personDescriptor,
-                        'quotaInfoCollection.timeoffType': timeoffRequest.type
-                      }, 
-                      { $inc: { 'quotaInfoCollection.$.bankedHours': -timeoffRequest.duration }}, 
-                      {}, 
-                      function(err, timeoffQuota) {
-        // TODO: Add logging
-    });
+    TimeoffAccrualService.ApplyValueDeltaToBankedBalance(
+        timeoffRequest.requestor.personDescriptor,
+        timeoffRequest.type,
+        -timeoffRequest.duration
+    );
 };
 
 module.exports = function(app) {

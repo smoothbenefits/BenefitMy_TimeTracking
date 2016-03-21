@@ -12,7 +12,8 @@ var TimeoffQuotaSchema = new Schema({
         annualTargetHours: { type: Number, default: 0 },
         accrualSpecs: {
             accrualFrequency: { type: String, required: true },
-            accruedHours: { type: Number, default: 0 }
+            accruedHours: { type: Number, default: 0 },
+            lastAccrualTimestamp: { type: Date, default: Date.now }
         }
     }],
     createdTimestamp: { type: Date },
