@@ -31,12 +31,12 @@ module.exports = function(app) {
     });
 
     app.post('/api/v1/timeoff_quotas', function(req, res) {
-        var pDescriptor = req.body.personDescriptor;
-        var cDescriptor = req.body.companyDescriptor;
+        var personDescriptor = req.body.personDescriptor;
+        var companyDescriptor = req.body.companyDescriptor;
         TimeoffQuota.findOneAndUpdate(   
             {
-                personDescriptor: pDescriptor,
-                companyDescriptor: cDescriptor
+                personDescriptor: personDescriptor,
+                companyDescriptor: companyDescriptor
             },
             req.body,
             {new: true, upsert: true},
