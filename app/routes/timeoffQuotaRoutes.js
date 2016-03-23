@@ -1,4 +1,5 @@
 var TimeoffQuota = require('../models/timeoffQuota');
+var TimeoffAccrualService = require('../services/TimeoffAccrualService');
 
 module.exports = function(app) {
 
@@ -28,5 +29,10 @@ module.exports = function(app) {
                 }
                 res.json(timeoffQuota);
             });
+    });
+
+    app.get('/api/v1/timeoff_quotas/execute_accrual', function(req, res) {
+        TimeoffAccrualService.ExecuteAccrualForAllRecords();
+        res.status(200).send('Accrual on all records completed!');
     });
 };
