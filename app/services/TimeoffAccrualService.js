@@ -37,10 +37,10 @@ var _executeAccrualForRecord = function(timeoffQuotaRecord) {
     }
 
     timeoffQuotaRecord.quotaInfoCollection.forEach(
-        function(quotaInfo) {
+        function(quotaInfoItem) {
             _executeAccrualForQuotaInfo(
                 timeoffQuotaRecord._id,
-                quotaInfo
+                quotaInfoItem
             );
         }
     );
@@ -50,16 +50,16 @@ var _executeAccrualForRecord = function(timeoffQuotaRecord) {
     Execute the accrual logic on a single quota info record, one of the sub
     documents corresponding to the possible set of timeoff types.
 */
-var _executeAccrualForQuotaInfo = function(timeoffQuotaRecordId, quotaInfo) {
-    if (!_canAccrualQuotaInfo(quotaInfo)) {
+var _executeAccrualForQuotaInfo = function(timeoffQuotaRecordId, quotaInfoItem) {
+    if (!_canAccrualQuotaInfo(quotaInfoItem)) {
         return;
     }
 
     // Get the appropriate strategy and compute the value for accrual
-    var accrualStrategy = AccrualFrequencyStrategyMapping[quotaInfo.accrualSpecs.accrualFrequency];
+    var accrualStrategy = AccrualFrequencyStrategyMapping[quotaInfoItem.accrualSpecs.accrualFrequency];
     var accrualValue = accrualStrategy.CalculateAccuralValue(
-            quotaInfo.annualTargetHours,
-            quotaInfo.accrualSpecs.lastAccrualTimestamp
+            quotaInfoItem.annualTargetHours,
+            quotaInfoItem.accrualSpecs.lastAccrualTimestamp
         );
 
     // Now really apply the accrual value to the quota info
@@ -67,7 +67,7 @@ var _executeAccrualForQuotaInfo = function(timeoffQuotaRecordId, quotaInfo) {
     if (accrualValue != null) {
         _applyValueDeltaToBankedAndAccrualBalance(
             timeoffQuotaRecordId,
-            quotaInfo._id,
+            quotaInfoItem._id,
             accrualValue
         );
     }
