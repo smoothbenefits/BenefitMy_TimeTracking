@@ -6,6 +6,10 @@ var TimeoffQuotaSchema = new Schema({
         type: String, 
         required: true
     },
+    companyDescriptor:{
+        type: String,
+        required: true
+    },
     quotaInfoCollection:[{
         timeoffType: { type: String, required: true },
         bankedHours: { type: Number, default: 0 },
