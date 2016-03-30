@@ -6,13 +6,18 @@ var TimeoffQuotaSchema = new Schema({
         type: String, 
         required: true
     },
+    companyDescriptor:{
+        type: String,
+        required: true
+    },
     quotaInfoCollection:[{
         timeoffType: { type: String, required: true },
         bankedHours: { type: Number, default: 0 },
         annualTargetHours: { type: Number, default: 0 },
         accrualSpecs: {
             accrualFrequency: { type: String, required: true },
-            accruedHours: { type: Number, default: 0 }
+            accruedHours: { type: Number, default: 0 },
+            lastAccrualTimestamp: { type: Date, default: Date.now }
         }
     }],
     createdTimestamp: { type: Date },
