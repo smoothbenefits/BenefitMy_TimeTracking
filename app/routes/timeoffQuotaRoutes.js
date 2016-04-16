@@ -17,6 +17,25 @@ module.exports = function(app) {
         });
     });
 
+    app.put('/api/v1/person/:descriptor/timeoff_quota', function(req, res){
+        var personDescriptor = req.params.descriptor;
+        var newModel = req.body
+        newModel.modifiedTimestamp = Date.now();
+        TimeoffQuota
+        .findOneAndUpdate(
+            {'personDescriptor':personDescriptor},
+            newModel,
+            {upsert:true},
+            function(err, updatedModel){
+                if (err){
+                    res.status(400).send(err);
+                }
+                res.setHeader('Cache-Control', 'no-cache');
+                res.json(updatedModel);
+            }
+        );
+    });
+
     app.get('/api/v1/company/:company/timeoff_quotas', function(req, res){
         var companyDescriptor = req.params.company;
         TimeoffQuota.find({companyDescriptor: companyDescriptor})
