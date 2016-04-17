@@ -37,6 +37,7 @@ module.exports = function(app) {
         .exec(function(err, entries){
             if (err) {
                 res.status(400).send(err);
+                return;
             }
 
             res.setHeader('Cache-Control', 'no-cache');
@@ -60,6 +61,7 @@ module.exports = function(app) {
         .exec(function(err, entries){
             if (err) {
                 res.status(400).send(err);
+                return;
             }
 
             res.setHeader('Cache-Control', 'no-cache');
@@ -81,6 +83,7 @@ module.exports = function(app) {
         .exec(function(err, entries){
             if (err) {
                 res.status(400).send(err);
+                return;
             }
 
             res.setHeader('Cache-Control', 'no-cache');
@@ -93,6 +96,7 @@ module.exports = function(app) {
         WorkTimeSheet.create(req.body, function(err, createdEntry) {
             if (err) {
                 res.status(400).send(err);
+                return;
             }
 
             res.json(createdEntry);
@@ -110,6 +114,7 @@ module.exports = function(app) {
             function(err, updatedTimesheet){
                 if (err){
                     res.status(400).send(err);
+                    return;
                 }
                 res.setHeader('Cache-Control', 'no-cache');
                 res.json(updatedTimesheet);
