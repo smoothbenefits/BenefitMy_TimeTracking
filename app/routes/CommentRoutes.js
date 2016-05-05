@@ -10,6 +10,7 @@ module.exports = function(app) {
         .exec(function(err, comments) {
             if (err) {
                 res.send(err);
+                return;
             }
 
             res.setHeader('Cache-Control', 'no-cache');
@@ -31,6 +32,7 @@ module.exports = function(app) {
             .exec(function(err, comments) {
                 if (err) {
                     res.send(err);
+                    return;
                 }
 
                 res.setHeader('Cache-Control', 'no-cache');

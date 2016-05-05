@@ -25,6 +25,7 @@ module.exports = function(app) {
         .exec(function(err, timeoffs){
             if (err) {
                 res.send(err);
+                return;
             }
 
             res.setHeader('Cache-Control', 'no-cache');
@@ -41,6 +42,7 @@ module.exports = function(app) {
         .exec(function(err, timeoffs){
             if (err) {
                 res.send(err);
+                return;
             }
 
             res.setHeader('Cache-Control', 'no-cache');
@@ -54,6 +56,7 @@ module.exports = function(app) {
         Timeoff.create(req.body, function(err, createdTimeOff) {
             if (err) {
                 res.send(err);
+                return;
             }
 
             // Send notification email
@@ -73,6 +76,7 @@ module.exports = function(app) {
                           function(err, timeoff){
             if (err) {
                 res.send(err);
+                return;
             }
 
             // Apply to the user's available balance.
