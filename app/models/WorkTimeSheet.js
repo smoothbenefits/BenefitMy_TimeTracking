@@ -29,49 +29,56 @@ module.exports = mongoose.model('WorkTimeSheet', {
                 timeRange: {
                     start: { type: Date },
                     end: { type: Date }
-                }
+                },
+                recordType: { type: String }
             },
             monday: {
                 hours: { type: Number, default: 0 },
                 timeRange: {
                     start: { type: Date },
                     end: { type: Date }
-                }
+                },
+                recordType: { type: String }
             },
             tuesday: {
                 hours: { type: Number, default: 0 },
                 timeRange: {
                     start: { type: Date },
                     end: { type: Date }
-                }
+                },
+                recordType: { type: String }
             },
             wednesday: {
                 hours: { type: Number, default: 0 },
                 timeRange: {
                     start: { type: Date },
                     end: { type: Date }
-                }
+                },
+                recordType: { type: String }
             },
             thursday: {
                 hours: { type: Number, default: 0 },
                 timeRange: {
                     start: { type: Date },
                     end: { type: Date }
-                }
+                },
+                recordType: { type: String }
             },
             friday: {
                 hours: { type: Number, default: 0 },
                 timeRange: {
                     start: { type: Date },
                     end: { type: Date }
-                }
+                },
+                recordType: { type: String }
             },
             saturday: {
                 hours: { type: Number, default: 0 },
                 timeRange: {
                     start: { type: Date },
                     end: { type: Date }
-                }
+                },
+                recordType: { type: String }
             }
         },
         overtimeHours: {
@@ -80,14 +87,16 @@ module.exports = mongoose.model('WorkTimeSheet', {
                 timeRange: {
                     start: { type: Date },
                     end: { type: Date }
-                }
+                },
+                recordType: { type: String }
             },
             monday: {
                 hours: { type: Number, default: 0 },
                 timeRange: {
                     start: { type: Date },
                     end: { type: Date }
-                }
+                },
+                recordType: { type: String }
             },
             tuesday: {
                 hours: { type: Number, default: 0 },
@@ -101,28 +110,32 @@ module.exports = mongoose.model('WorkTimeSheet', {
                 timeRange: {
                     start: { type: Date },
                     end: { type: Date }
-                }
+                },
+                recordType: { type: String }
             },
             thursday: {
                 hours: { type: Number, default: 0 },
                 timeRange: {
                     start: { type: Date },
                     end: { type: Date }
-                }
+                },
+                recordType: { type: String }
             },
             friday: {
                 hours: { type: Number, default: 0 },
                 timeRange: {
                     start: { type: Date },
                     end: { type: Date }
-                }
+                },
+                recordType: { type: String }
             },
             saturday: {
                 hours: { type: Number, default: 0 },
                 timeRange: {
                     start: { type: Date },
                     end: { type: Date }
-                }
+                },
+                recordType: { type: String }
             }
         }
     }],
