@@ -42,6 +42,7 @@ module.exports = function(app) {
 
             res.setHeader('Cache-Control', 'no-cache');
             res.json(entries);
+            return;
         });
     });
 
@@ -66,6 +67,7 @@ module.exports = function(app) {
 
             res.setHeader('Cache-Control', 'no-cache');
             res.json(entries);
+            return;
         });
     });
 
@@ -88,6 +90,7 @@ module.exports = function(app) {
 
             res.setHeader('Cache-Control', 'no-cache');
             res.json(entries);
+            return;
         });
     });
 
@@ -100,6 +103,7 @@ module.exports = function(app) {
             }
 
             res.json(createdEntry);
+            return;
         });
     });
 
@@ -118,6 +122,7 @@ module.exports = function(app) {
                 }
                 res.setHeader('Cache-Control', 'no-cache');
                 res.json(updatedTimePunchCard);
+                return;
         });
     });
 };
