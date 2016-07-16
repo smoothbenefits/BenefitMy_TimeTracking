@@ -30,7 +30,7 @@ module.exports = function(app) {
             'employee.personDescriptor': employeeId,
             'date': {
                 $gte: dateRange.startDate,
-                $lt: dateRange.endDate
+                $lte: dateRange.endDate
             }
         })
         .sort('date')
@@ -55,7 +55,7 @@ module.exports = function(app) {
             'employee.companyDescriptor': companyToken,
             'date': {
                 $gte: dateRange.startDate,
-                $lt: dateRange.endDate
+                $lte: dateRange.endDate
             }
         })
         .sort('employee.personDescriptor')
@@ -78,7 +78,7 @@ module.exports = function(app) {
         .find({
             'date': {
                 $gte: dateRange.startDate,
-                $lt: dateRange.endDate
+                $lte: dateRange.endDate
             }
         })
         .sort('employee.personDescriptor')
@@ -124,5 +124,19 @@ module.exports = function(app) {
                 res.json(updatedTimePunchCard);
                 return;
         });
+    });
+
+    app.delete('/api/v1/time_punch_cards/:id', function(req, res) {
+      var id = req.params.id;
+
+      TimePunchCard.findByIdAndRemove(id, function(err, punchCard) {
+        if (err) {
+          res.status(404).send(err);
+          return;
+        }
+
+        res.json({ message: 'Successfully deleted' });
+        return;
+      });
     });
 };
