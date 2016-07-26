@@ -20,8 +20,8 @@ module.exports = mongoose.model('TimePunchCard', {
         }
     },
     attributes: [ AttributeSchema ],
-    start: { type: Date, required: false },
-    end: { type: Date, required: false },
+    start: { type: Date },
+    end: { type: Date },
     recordType: { type: String, required: true },
     createdTimestamp: { type: Date, default: Date.now },
     updatedTimestamp: { type: Date, default: Date.now }
