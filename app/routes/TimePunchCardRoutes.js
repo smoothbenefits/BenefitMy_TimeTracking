@@ -31,7 +31,8 @@ module.exports = function(app) {
             'date': {
                 $gte: dateRange.startDate,
                 $lte: dateRange.endDate
-            }
+            },
+            'inProgress': {'$ne': true}
         })
         .sort('date')
         .exec(function(err, entries){
@@ -56,7 +57,8 @@ module.exports = function(app) {
             'date': {
                 $gte: dateRange.startDate,
                 $lte: dateRange.endDate
-            }
+            },
+            'inProgress': {'$ne': true}
         })
         .sort('employee.personDescriptor')
         .exec(function(err, entries){
@@ -79,7 +81,8 @@ module.exports = function(app) {
             'date': {
                 $gte: dateRange.startDate,
                 $lte: dateRange.endDate
-            }
+            },
+            'inProgress': {'$ne': true}
         })
         .sort('employee.personDescriptor')
         .exec(function(err, entries){
@@ -139,4 +142,27 @@ module.exports = function(app) {
         return;
       });
     });
+
+    app.get('/api/v1/user/:id/time_punch_cards', function(req, res){
+      var userId = req.params.id;
+      var inProgress = null;
+      if (req.query.inprogress === 'true'){
+        inProgress = true;
+      }
+
+      TimePunchCard
+        .find({
+          'employee.personDescriptor': userId,
+          'inProgress': inProgress
+        })
+        .exec(function(err, cards){
+          if (err) {
+              res.status(400).send(err);
+              return;
+          }
+
+          res.setHeader('Cache-Control', 'no-cache');
+          res.json(cards);
+        });
+    })
 };
