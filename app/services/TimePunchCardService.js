@@ -11,8 +11,10 @@ var splitCrossDatesPunchCard = function(punchCard) {
 
   singleDayDurations.forEach(function(duration) {
     var newCard = JSON.parse(JSON.stringify(punchCard));
-    newCard.start = duration.startMoment;
-    newCard.end = duration.endMoment;
+
+    newCard.date = duration.startMoment.toDate();
+    newCard.start = duration.startMoment.toDate();
+    newCard.end = duration.endMoment.toDate();
     singleDayPunchCards.push(newCard);
   });
 
