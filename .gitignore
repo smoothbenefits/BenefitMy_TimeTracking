@@ -1,5 +1,6 @@
 node_modules
 lib
+.vscode
 *.log
 /public/scripts/bundle.js
 /public/scripts/bundle.min.js
