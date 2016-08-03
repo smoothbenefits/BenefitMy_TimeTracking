@@ -97,15 +97,14 @@ module.exports = function(app) {
 
     app.post('/api/v1/time_punch_cards', function(req, res) {
 
-      var punchCards = TimePunchCardService.splitCrossDatesPunchCard(req.body);
-      TimePunchCard.collection.insert(punchCards, function(err, createdEntries) {
-          if (err) {
-              res.status(400).send(err);
-              return;
-          }
-
-          res.json(createdEntries);
+      TimePunchCard.create(req.body, function(err, createdEntry) {
+        if (err) {
+          res.status(400).send(err);
           return;
+        }
+
+        res.json(createdEntry);
+        return;
       });
     });
 
@@ -113,18 +112,17 @@ module.exports = function(app) {
         var id = req.params.id;
         var timePunchCardToUpdate = req.body
         timePunchCardToUpdate.updatedTimestamp = Date.now();
-        TimePunchCard
-        .findOneAndUpdate(
-            {_id:id},
-            timePunchCardToUpdate,
-            function(err, updatedTimePunchCard){
-                if (err){
-                    res.status(400).send(err);
-                    return;
-                }
-                res.setHeader('Cache-Control', 'no-cache');
-                res.json(updatedTimePunchCard);
-                return;
+
+        var punchCards = TimePunchCardService.splitCrossDatesPunchCard(timePunchCardToUpdate);
+        TimePunchCard.find({_id: id}).remove(() => {
+          TimePunchCard.collection.insert(punchCards, function(err, createdEntries) {
+            if (err) {
+              return res.status(400).send(err);
+            }
+
+            res.setHeader('Cache-Control', 'no-cache');
+            return res.json(createdEntries);
+          });
         });
     });
 

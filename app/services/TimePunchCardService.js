@@ -28,20 +28,22 @@ var splitCrossDateDuration = function(duration, singleDays) {
   }
 
   // Get the earliest moment of the next day of start time
+  var singleDay;
   var nextDay = duration.start.clone().add(1, 'days').startOf('day');
   if (nextDay.isBefore(duration.end)) {
-    var singleDay = {
+    singleDay = {
       'startMoment': duration.start.clone(),
       'endMoment': duration.start.clone().endOf('day')
     };
     singleDays.push(singleDay);
   } else {
-    singleDays.push({
+    singleDay = {
       'startMoment': duration.start.clone(),
       'endMoment': duration.end.clone()
-    });
+    };
   }
 
+  singleDays.push(singleDay);
   duration.start = nextDay;
   return splitCrossDateDuration(duration, singleDays);
 };
