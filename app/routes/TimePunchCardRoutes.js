@@ -118,9 +118,8 @@ module.exports = function(app) {
         var id = req.params.id;
         var timePunchCardToUpdate = req.body
         timePunchCardToUpdate.updatedTimestamp = Date.now();
-
         var punchCards = TimePunchCardService.splitCrossDatesPunchCard(timePunchCardToUpdate);
-        TimePunchCard.find({_id: id}).remove(() => {
+        TimePunchCard.find({_id: id}).remove(function() {
           TimePunchCard.collection.insert(punchCards, function(err, createdEntries) {
             if (err) {
               return res.status(400).send(err);
@@ -135,7 +134,7 @@ module.exports = function(app) {
     app.delete('/api/v1/time_punch_cards/:id', function(req, res) {
       var id = req.params.id;
 
-      TimePunchCard.findByIdAndRemove(id, function(err, punchCard) {
+      TimePunchCard.findByIdAndRemove(id, function(err) {
         if (err) {
           res.status(404).send(err);
           return;
