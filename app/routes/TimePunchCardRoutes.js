@@ -1,5 +1,6 @@
 var moment = require('moment');
 var TimePunchCard = require('../models/timePunchCard');
+var TimePunchCardService = require('../services/TimePunchCardService');
 
 module.exports = function(app) {
 
@@ -52,7 +53,7 @@ module.exports = function(app) {
 
     app.get('/api/v1/company/:token/time_punch_cards', function(req, res){
         var dateRange = _getDatesFromParam(req.query);
-        
+
         var companyToken = req.params.token;
         TimePunchCard
         .find({
@@ -78,7 +79,7 @@ module.exports = function(app) {
 
     app.get('/api/v1/time_punch_cards', function(req, res) {
         var dateRange = _getDatesFromParam(req.query);
-        
+
         TimePunchCard
         .find({
             'date': {
@@ -102,33 +103,32 @@ module.exports = function(app) {
 
     app.post('/api/v1/time_punch_cards', function(req, res) {
 
-        TimePunchCard.create(req.body, function(err, createdEntry) {
-            if (err) {
-                res.status(400).send(err);
-                return;
-            }
+      TimePunchCard.create(req.body, function(err, createdEntry) {
+        if (err) {
+          res.status(400).send(err);
+          return;
+        }
 
-            res.json(createdEntry);
-            return;
-        });
+        res.json(createdEntry);
+        return;
+      });
     });
 
     app.put('/api/v1/time_punch_cards/:id', function(req, res){
         var id = req.params.id;
         var timePunchCardToUpdate = req.body
         timePunchCardToUpdate.updatedTimestamp = Date.now();
-        TimePunchCard
-        .findOneAndUpdate(
-            {_id:id},
-            timePunchCardToUpdate,
-            function(err, updatedTimePunchCard){
-                if (err){
-                    res.status(400).send(err);
-                    return;
-                }
-                res.setHeader('Cache-Control', 'no-cache');
-                res.json(updatedTimePunchCard);
-                return;
+
+        var punchCards = TimePunchCardService.splitCrossDatesPunchCard(timePunchCardToUpdate);
+        TimePunchCard.find({_id: id}).remove(() => {
+          TimePunchCard.collection.insert(punchCards, function(err, createdEntries) {
+            if (err) {
+              return res.status(400).send(err);
+            }
+
+            res.setHeader('Cache-Control', 'no-cache');
+            return res.json(createdEntries);
+          });
         });
     });
 
