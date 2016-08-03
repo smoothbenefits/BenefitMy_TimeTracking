@@ -23,7 +23,10 @@ module.exports = function(app) {
         // Read in filter parameters
 
         var dateRange = _getDatesFromParam(req.query);
-
+        var inProgress = null;
+        if (req.query.inprogress === 'true'){
+          inProgress = true;
+        }
         var employeeId = req.params.token;
         TimePunchCard
         .find({
@@ -31,7 +34,8 @@ module.exports = function(app) {
             'date': {
                 $gte: dateRange.startDate,
                 $lte: dateRange.endDate
-            }
+            },
+            'inProgress': inProgress
         })
         .sort('date')
         .exec(function(err, entries){
@@ -56,7 +60,8 @@ module.exports = function(app) {
             'date': {
                 $gte: dateRange.startDate,
                 $lte: dateRange.endDate
-            }
+            },
+            'inProgress': {'$ne': true}
         })
         .sort('employee.personDescriptor')
         .exec(function(err, entries){
@@ -79,7 +84,8 @@ module.exports = function(app) {
             'date': {
                 $gte: dateRange.startDate,
                 $lte: dateRange.endDate
-            }
+            },
+            'inProgress': {'$ne': true}
         })
         .sort('employee.personDescriptor')
         .exec(function(err, entries){
