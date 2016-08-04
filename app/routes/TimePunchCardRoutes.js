@@ -121,10 +121,13 @@ module.exports = function(app) {
     });
 
     app.put('/api/v1/time_punch_cards/:id', function(req, res){
-        var id = req.params.id;
-        var timePunchCardToUpdate = req.body
-        timePunchCardToUpdate.updatedTimestamp = Date.now();
-        var punchCards = TimePunchCardService.splitCrossDatesPunchCard(timePunchCardToUpdate);
+      var id = req.params.id;
+      var timePunchCardToUpdate = req.body
+      timePunchCardToUpdate.updatedTimestamp = Date.now();
+
+      TimePunchCardService.parsePunchCardWithGeoCoordinate(timePunchCardToUpdate,
+      function(parsedPunchCard) {
+        var punchCards = TimePunchCardService.splitCrossDatesPunchCard(parsedPunchCard);
         TimePunchCard.find({_id: id}).remove(function() {
           TimePunchCard.collection.insert(punchCards, function(err, createdEntries) {
             if (err) {
@@ -135,6 +138,9 @@ module.exports = function(app) {
             return res.json(createdEntries);
           });
         });
+      }, function(err) {
+        return res.status(400).send(err);
+      });
     });
 
     app.delete('/api/v1/time_punch_cards/:id', function(req, res) {

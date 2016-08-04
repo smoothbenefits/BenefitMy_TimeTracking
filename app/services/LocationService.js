@@ -26,14 +26,15 @@ var ReverseGeocodeCoordinate = function(latitude, longitude, success, error) {
             return _.contains(component.types, 'administrative_area_level_1');
           });
 
-          return success({
+          success({
             'coordinate': coordinate,
             'formatted_address': result.formatted_address,
             'state': state
           });
-
+          return;
         }).on('error', function(err) {
-          return error(err);
+          error(err);
+          return;
         });
 };
 

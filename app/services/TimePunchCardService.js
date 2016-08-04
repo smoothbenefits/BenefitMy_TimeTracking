@@ -56,30 +56,47 @@ var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
     return attribute.name === 'Coordinate';
   });
 
+  var state = _.find(punchCard.attributes, function(attribute) {
+    return attribute.name === 'State';
+  });
+
   if (coordinate && coordinate.value) {
     LocationService.ReverseGeocodeCoordinate(
       coordinate.value.latitude,
       coordinate.value.longitude,
       function(address) {
-        // Add state
-        punchCard.attributes.push({
-          'name': 'State',
-          'value': address.state.long_name
-        });
+        console.log(address.state);
+        console.log(state);
+        if (state && state.value && state.value != address.state.long_name) {
+          error('Location provided does not match existing state value.');
+        } else {
+          if (!state || !state.value) {
+            // Add state
+            punchCard.attributes.push({
+              'name': 'State',
+              'value': address.state.long_name
+            });
+          }
 
-        // Add formatted address
-        punchCard.attributes.push({
-          'name': 'FormattedAddress',
-          'value': address.formatted_address
-        });
+          // Add formatted address
+          punchCard.attributes.push({
+            'name': 'FormattedAddress',
+            'value': address.formatted_address
+          });
 
-        // Add geometry location
-        punchCard.attributes.push({
-          'name': 'GeometryLocation',
-          'value': address.coordinate
-        });
+          // Add geometry location
+          punchCard.attributes.push({
+            'name': 'Latitude',
+            'value': address.coordinate.latitude
+          });
+          punchCard.attributes.push({
+            'name': 'Longitude',
+            'value': address.coordinate.longitude
+          });
 
-        success(punchCard);
+          success(punchCard);
+
+        }
       },
       function(err) {
         error(err);
