@@ -103,14 +103,20 @@ module.exports = function(app) {
 
     app.post('/api/v1/time_punch_cards', function(req, res) {
 
-      TimePunchCard.create(req.body, function(err, createdEntry) {
-        if (err) {
-          res.status(400).send(err);
-          return;
-        }
+      TimePunchCardService.parsePunchCardWithGeoCoordinate(req.body, function(parsed) {
+        // success callback
+        TimePunchCard.create(parsed, function(err, createdEntry) {
+          if (err) {
+            res.status(400).send(err);
+            return;
+          }
 
-        res.json(createdEntry);
-        return;
+          res.json(createdEntry);
+          return;
+        });
+      }, function(error) {
+        //error callback
+        return res.status(400).send('Failed to parse geometry location');
       });
     });
 
