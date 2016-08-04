@@ -57,7 +57,7 @@ var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
   });
 
   if (coordinate && coordinate.value) {
-    var address = LocationService.ReverseGeocodeCoordinate(
+    LocationService.ReverseGeocodeCoordinate(
       coordinate.value.latitude,
       coordinate.value.longitude,
       function(address) {

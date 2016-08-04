@@ -114,9 +114,9 @@ module.exports = function(app) {
           res.json(createdEntry);
           return;
         });
-      }, function(error) {
+      }, function(err) {
         //error callback
-        return res.status(400).send('Failed to parse geometry location');
+        return res.status(400).send(err);
       });
     });
 
