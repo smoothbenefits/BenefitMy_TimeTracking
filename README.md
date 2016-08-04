@@ -5,6 +5,7 @@ System Requirements:
 
 - Need to npm install all packages from package.json
     - If permission issue encountered, try with sudo
+    - Run `npm install -g gulp` to set up gulp in global context
 - Installation of MongoDB
     - See \config\db.js for assumed DB configurations
 - Run the server using with command "npm start"
@@ -14,24 +15,24 @@ System Requirements:
 Development Process:
 
 - Use Git Flow
-    - https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow 
+    - https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow
 - Git branches:
-    - development branch. The default branch. All feature branches should be off of this. 
+    - development branch. The default branch. All feature branches should be off of this.
     - master branch. The "production" branch. Host of the "released" code base.
     - release-X.Y.Z branch. Branches that are created to release a batch of deliverables from development to master. It should be off of development, and should be merged to master, and back-merge to development when release is concluded.
-    - Feature branches. Branches off of development branch. One for each feature/ticket. Should be merged to development branch once concluded. 
+    - Feature branches. Branches off of development branch. One for each feature/ticket. Should be merged to development branch once concluded.
 
 Deployment:
 
 - One time setup
     - Prerequsite: Install Elastic Beanstalk CLI
-        - http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-install.html 
+        - http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/eb-cli3-install.html
     - Config the credentials to use with the EB CLI locally
-        - Run commang'eb init'
+        - Run command `eb init`
         - When prompted, enter the 'Access ID' and 'Secret Key' for the time tracking service EB user
 - Routine steps
-    - Execute deployment with command "./deploy.sh"
-        - If permission issue is encountered, try updating the ACL on the bash script file. "chmod u+x ./deploy.sh"
+    - Execute deployment with command `./deploy.sh`
+        - If permission issue is encountered, try updating the ACL on the bash script file. `chmod u+x ./deploy.sh`
     - The process could take minutes. So be patient.
     - Once the deployment is done, console should show the successful message
         - "The deployment has been completed!"
@@ -59,7 +60,7 @@ Deployment:
         - Make sure to sync with the remote branch
         - Make sure to be clear with any local changes
         - Run the above routine steps to deploy to AWS
-        - Merge the release-X.Y.Z branch back to development 
+        - Merge the release-X.Y.Z branch back to development
 
 Database:
 
