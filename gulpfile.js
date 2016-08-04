@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var eslint = require('gulp-eslint');
 
 gulp.task('lint', function() {
-  return gulp.src(['**/*.js', '!node_modules/**', '!public/**', '!data_migration/**'])
+  return gulp.src(['app/*.js'])
           .pipe(eslint({
             "fix": true
           }))
