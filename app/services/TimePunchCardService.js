@@ -51,22 +51,20 @@ var splitCrossDateDuration = function(duration, singleDays) {
 };
 
 var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
-  // If coordinate is provided, then decode to human readable address
-  var coordinate = _.find(punchCard.attributes, function(attribute) {
-    return attribute.name === 'Coordinate';
+  // If coordinates are provided, then decode to human readable address
+  var coordinates = _.find(punchCard.attributes, function(attribute) {
+    return attribute.name === 'Coordinates';
   });
 
   var state = _.find(punchCard.attributes, function(attribute) {
     return attribute.name === 'State';
   });
 
-  if (coordinate && coordinate.value) {
+  if (coordinates && coordinates.value) {
     LocationService.ReverseGeocodeCoordinate(
-      coordinate.value.latitude,
-      coordinate.value.longitude,
+      coordinates.value.latitude,
+      coordinates.value.longitude,
       function(address) {
-        console.log(address.state);
-        console.log(state);
         if (state && state.value && state.value != address.state.long_name) {
           error('Location provided does not match existing state value.');
         } else {
@@ -82,16 +80,6 @@ var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
           punchCard.attributes.push({
             'name': 'FormattedAddress',
             'value': address.formatted_address
-          });
-
-          // Add geometry location
-          punchCard.attributes.push({
-            'name': 'Latitude',
-            'value': address.coordinate.latitude
-          });
-          punchCard.attributes.push({
-            'name': 'Longitude',
-            'value': address.coordinate.longitude
           });
 
           success(punchCard);
