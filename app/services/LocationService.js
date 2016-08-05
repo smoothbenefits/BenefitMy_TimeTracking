@@ -18,16 +18,11 @@ var ReverseGeocodeCoordinate = function(latitude, longitude, success, error) {
         }).on('success', function(response) {
           // Always get the first result from result list
           var result = response.results[0];
-          var coordinate = {
-            'latitude': result.geometry.location.lat,
-            'longitude': result.geometry.location.lng
-          };
           var state = _.find(result.address_components, function(component) {
             return _.contains(component.types, 'administrative_area_level_1');
           });
 
           success({
-            'coordinate': coordinate,
             'formatted_address': result.formatted_address,
             'state': state
           });
