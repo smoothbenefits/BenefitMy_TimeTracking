@@ -1,0 +1,13 @@
+dependencies:
+  override:
+    - npm install --dev
+
+machine:
+  node:
+    version: 4.3.0
+  post:
+    - npm install -g gulp
+
+test:
+  override:
+    - gulp lint

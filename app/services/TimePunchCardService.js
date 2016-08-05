@@ -1,4 +1,6 @@
+var _ = require('underscore');
 var moment = require('moment');
+var LocationService = require('./LocationService');
 
 var splitCrossDatesPunchCard = function(punchCard) {
   var start = moment(punchCard.start);
@@ -48,6 +50,54 @@ var splitCrossDateDuration = function(duration, singleDays) {
   return splitCrossDateDuration(duration, singleDays);
 };
 
+var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
+  // If coordinates are provided, then decode to human readable address
+  var coordinates = _.find(punchCard.attributes, function(attribute) {
+    return attribute.name === 'Coordinates';
+  });
+
+  var state = _.find(punchCard.attributes, function(attribute) {
+    return attribute.name === 'State';
+  });
+
+  if (coordinates && coordinates.value) {
+    LocationService.ReverseGeocodeCoordinate(
+      coordinates.value.latitude,
+      coordinates.value.longitude,
+      function(address) {
+        if (state && state.value && state.value != address.state.long_name) {
+          error('Location provided does not match existing state value.');
+        } else {
+          if (!state || !state.value) {
+            // Add state
+            punchCard.attributes.push({
+              'name': 'State',
+              'value': address.state.long_name
+            });
+          }
+
+          // Add formatted address
+          punchCard.attributes.push({
+            'name': 'FormattedAddress',
+            'value': address.formatted_address
+          });
+
+          success(punchCard);
+
+        }
+      },
+      function(err) {
+        error(err);
+      }
+    );
+  }
+  else {
+    // if coordinate is not provided, continue the process on success route
+    success(punchCard);
+  }
+}
+
 module.exports = {
-  splitCrossDatesPunchCard: splitCrossDatesPunchCard
+  splitCrossDatesPunchCard: splitCrossDatesPunchCard,
+  parsePunchCardWithGeoCoordinate: parsePunchCardWithGeoCoordinate
 };

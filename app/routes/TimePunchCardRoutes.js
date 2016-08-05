@@ -103,24 +103,32 @@ module.exports = function(app) {
 
     app.post('/api/v1/time_punch_cards', function(req, res) {
 
-      TimePunchCard.create(req.body, function(err, createdEntry) {
-        if (err) {
-          res.status(400).send(err);
-          return;
-        }
+      TimePunchCardService.parsePunchCardWithGeoCoordinate(req.body, function(parsed) {
+        // success callback
+        TimePunchCard.create(parsed, function(err, createdEntry) {
+          if (err) {
+            res.status(400).send(err);
+            return;
+          }
 
-        res.json(createdEntry);
-        return;
+          res.json(createdEntry);
+          return;
+        });
+      }, function(err) {
+        //error callback
+        return res.status(400).send(err);
       });
     });
 
     app.put('/api/v1/time_punch_cards/:id', function(req, res){
-        var id = req.params.id;
-        var timePunchCardToUpdate = req.body
-        timePunchCardToUpdate.updatedTimestamp = Date.now();
+      var id = req.params.id;
+      var timePunchCardToUpdate = req.body
+      timePunchCardToUpdate.updatedTimestamp = Date.now();
 
-        var punchCards = TimePunchCardService.splitCrossDatesPunchCard(timePunchCardToUpdate);
-        TimePunchCard.find({_id: id}).remove(() => {
+      TimePunchCardService.parsePunchCardWithGeoCoordinate(timePunchCardToUpdate,
+      function(parsedPunchCard) {
+        var punchCards = TimePunchCardService.splitCrossDatesPunchCard(parsedPunchCard);
+        TimePunchCard.find({_id: id}).remove(function() {
           TimePunchCard.collection.insert(punchCards, function(err, createdEntries) {
             if (err) {
               return res.status(400).send(err);
@@ -130,12 +138,15 @@ module.exports = function(app) {
             return res.json(createdEntries);
           });
         });
+      }, function(err) {
+        return res.status(400).send(err);
+      });
     });
 
     app.delete('/api/v1/time_punch_cards/:id', function(req, res) {
       var id = req.params.id;
 
-      TimePunchCard.findByIdAndRemove(id, function(err, punchCard) {
+      TimePunchCard.findByIdAndRemove(id, function(err) {
         if (err) {
           res.status(404).send(err);
           return;
