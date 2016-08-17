@@ -21,7 +21,7 @@ module.exports = function(app) {
 
     app.post('/api/v1/comments', function(req, res) {
 
-        Comment.create(req.body, function(err, comment) {
+        Comment.create(req.body, function(err) {
             if (err) {
                 res.send(err);
             }
@@ -39,6 +39,6 @@ module.exports = function(app) {
                 res.json(comments);
             });
         });
-    
+
     });
 };

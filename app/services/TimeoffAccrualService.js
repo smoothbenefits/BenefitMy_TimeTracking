@@ -27,8 +27,8 @@ var ExecuteAccrualForAllRecords = function() {
 
 /**
     Execute the accrual logic on a single timeoff record.
-    This covers all sub documents corresponding to the 
-    possible set of timeoff types. 
+    This covers all sub documents corresponding to the
+    possible set of timeoff types.
 */
 var _executeAccrualForRecord = function(timeoffQuotaRecord) {
     if (!_canAccrualQuotaRecord(timeoffQuotaRecord)) {
@@ -89,27 +89,27 @@ var _canAccrualQuotaInfo = function(timeoffQuotaInfo) {
 };
 
 var _applyValueDeltaToBankedAndAccrualBalance = function(quotaRecordId, quotaInfoId, valueDelta) {
-    
+
     // The actual operation contains 3 editions
     //  1. Accrual on banked hours
     //  2. Accrual on accrued hours
     //  3. Set the "last accrued" time stamp
-    // Good thing here is that the 3 operations are wrapped 
+    // Good thing here is that the 3 operations are wrapped
     // in one single update, so they are of an atomic operation
     TimeoffQuota
     .findOneAndUpdate({
                         '_id': quotaRecordId,
                         'quotaInfoCollection._id': quotaInfoId
-                      }, 
-                      { 
-                        $inc: { 
+                      },
+                      {
+                        $inc: {
                             'quotaInfoCollection.$.bankedHours': valueDelta,
-                            'quotaInfoCollection.$.accrualSpecs.accruedHours': valueDelta 
+                            'quotaInfoCollection.$.accrualSpecs.accruedHours': valueDelta
                         },
                         $set: { 'quotaInfoCollection.$.accrualSpecs.lastAccrualTimestamp': Date.now() }
-                      }, 
-                      {}, 
-                      function(err, timeoffQuota) {
+                      },
+                      {},
+                      function() {
         // TODO: Add logging
     });
 };
@@ -124,10 +124,10 @@ var ApplyValueDeltaToBankedBalance = function(personDescriptor, timeoffType, val
     .findOneAndUpdate({
                         'personDescriptor': personDescriptor,
                         'quotaInfoCollection.timeoffType': timeoffType
-                      }, 
-                      { $inc: { 'quotaInfoCollection.$.bankedHours': valueDelta }}, 
-                      {}, 
-                      function(err, timeoffQuota) {
+                      },
+                      { $inc: { 'quotaInfoCollection.$.bankedHours': valueDelta }},
+                      {},
+                      function() {
         // TODO: Add logging
     });
 };

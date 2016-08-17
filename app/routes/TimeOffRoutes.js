@@ -1,7 +1,6 @@
 var emailService = require('../services/EmailService');
 var TimeoffAccrualService = require('../services/TimeoffAccrualService');
-var Timeoff = require('../models/timeoff'); 
-var TimeoffQuota = require('../models/timeoffQuota');
+var Timeoff = require('../models/timeoff');
 
 var applyApprovedRequestToBankedBalance = function(timeoffRequest) {
     if (timeoffRequest.status != 'APPROVED') {
@@ -70,9 +69,9 @@ module.exports = function(app) {
         var id = req.params.id;
         var status = req.body.status;
         Timeoff
-        .findOneAndUpdate({'_id': id}, 
-                          { $set: { status: status, decisionTimestamp: Date.now()}}, 
-                          {}, 
+        .findOneAndUpdate({'_id': id},
+                          { $set: { status: status, decisionTimestamp: Date.now()}},
+                          {},
                           function(err, timeoff){
             if (err) {
                 res.send(err);

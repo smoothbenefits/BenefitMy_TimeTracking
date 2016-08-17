@@ -24,7 +24,7 @@ var sendSupportEmail = function(
     text,
     includeSupportEmail) {
 
-    // Adjust the subject to indicate for testing based on the 
+    // Adjust the subject to indicate for testing based on the
     // environment.
     var nodeEnv = process.env.NODE_ENV;
     if (nodeEnv != 'production') {
@@ -33,7 +33,7 @@ var sendSupportEmail = function(
 
     // Determine whether should automatically include the support
     // email address as a recipient
-    includeSupportEmail = typeof includeSupportEmail !== 'undefined' 
+    includeSupportEmail = typeof includeSupportEmail !== 'undefined'
                 ? includeSupportEmail
                 : true;
 
@@ -50,7 +50,7 @@ var sendSupportEmail = function(
         text: text //, // plaintext body
     };
 
-    transporter.sendMail(mailOptions, function(error, info){
+    transporter.sendMail(mailOptions, function(error){
         if(error){
             // TODO: log error
             console.log(error);
@@ -66,7 +66,7 @@ var sendSupportEmailWithTemplate = function(
     contextData,
     includeSupportEmail) {
 
-    // Build mail contents form template    
+    // Build mail contents form template
     emailTemplates(templatesDir, function(err, template) {
         if (err) {
             // TODO: log error
@@ -84,7 +84,7 @@ var sendSupportEmailWithTemplate = function(
                 return;
             }
 
-            // Now we have the rendered html and text, use the normal 
+            // Now we have the rendered html and text, use the normal
             // email sending method to handle the main thing.
             sendSupportEmail(
                 toEmailList,
@@ -116,7 +116,7 @@ var sendTimeoffDecisionEmail = function(requestModel) {
 };
 
 var createMailContextFromTimeoffRequestModel = function(requestModel) {
-    requestModel.startDateTimeForDisplay = 
+    requestModel.startDateTimeForDisplay =
         commonUtilityService.getDisplayDate(requestModel.startDateTime);
     return {
         request: requestModel
