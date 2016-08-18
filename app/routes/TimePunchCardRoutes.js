@@ -125,20 +125,30 @@ module.exports = function(app) {
       var timePunchCardToUpdate = req.body
       timePunchCardToUpdate.updatedTimestamp = Date.now();
 
-      TimePunchCardService.parsePunchCardWithGeoCoordinate(timePunchCardToUpdate,
-      function(parsedPunchCard) {
-        var punchCards = TimePunchCardService.splitCrossDatesPunchCard(parsedPunchCard);
-        TimePunchCard.find({_id: id}).remove(function() {
-          TimePunchCard.collection.insert(punchCards, function(err, createdEntries) {
-            if (err) {
-              return res.status(400).send(err);
-            }
+      // Since we are going to use person descriptor as lookup
+      // to perform the update, Mongo will complain about "_id"
+      // and/or "__v" being presented on the new model, so we 
+      // have to clear those up.
+      delete timePunchCardToUpdate._id;
+      delete timePunchCardToUpdate.__v;
 
-            res.setHeader('Cache-Control', 'no-cache');
-            return res.json(createdEntries);
-          });
+      TimePunchCardService.parsePunchCardWithGeoCoordinate(req.body, function(parsed) {
+        // success callback
+        TimePunchCard
+        .findOneAndUpdate(
+            {_id:id},
+            timePunchCardToUpdate,
+            function(err, resultCard) {
+          if (err) {
+            res.status(400).send(err);
+            return;
+          }
+
+          res.json([resultCard]);
+          return;
         });
       }, function(err) {
+        //error callback
         return res.status(400).send(err);
       });
     });
