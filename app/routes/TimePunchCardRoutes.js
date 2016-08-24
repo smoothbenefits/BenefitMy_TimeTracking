@@ -22,12 +22,7 @@ module.exports = function(app) {
 
     app.get('/api/v1/employee/:token/time_punch_cards', function(req, res) {
         // Read in filter parameters
-
         var dateRange = _getDatesFromParam(req.query);
-        var inProgress = null;
-        if (req.query.inprogress === 'true'){
-          inProgress = true;
-        }
         var employeeId = req.params.token;
         TimePunchCard
         .find({
@@ -35,8 +30,7 @@ module.exports = function(app) {
             'date': {
                 $gte: dateRange.startDate,
                 $lte: dateRange.endDate
-            },
-            'inProgress': inProgress
+            }
         })
         .sort('date')
         .exec(function(err, entries){
