@@ -24,14 +24,19 @@ module.exports = function(app) {
         // Read in filter parameters
         var dateRange = _getDatesFromParam(req.query);
         var employeeId = req.params.token;
-        TimePunchCard
-        .find({
+        var searchCriteria = {
             'employee.personDescriptor': employeeId,
             'date': {
                 $gte: dateRange.startDate,
                 $lte: dateRange.endDate
             }
-        })
+        };
+
+        if(req.query.inprogress !== undefined){
+          searchCriteria['inProgress'] = req.query.inprogress==='true';
+        }
+        TimePunchCard
+        .find(searchCriteria)
         .sort('date')
         .exec(function(err, entries){
             if (err) {
