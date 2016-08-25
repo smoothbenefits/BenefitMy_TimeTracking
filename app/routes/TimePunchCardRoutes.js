@@ -22,22 +22,21 @@ module.exports = function(app) {
 
     app.get('/api/v1/employee/:token/time_punch_cards', function(req, res) {
         // Read in filter parameters
-
         var dateRange = _getDatesFromParam(req.query);
-        var inProgress = null;
-        if (req.query.inprogress === 'true'){
-          inProgress = true;
-        }
         var employeeId = req.params.token;
-        TimePunchCard
-        .find({
+        var searchCriteria = {
             'employee.personDescriptor': employeeId,
             'date': {
                 $gte: dateRange.startDate,
                 $lte: dateRange.endDate
-            },
-            'inProgress': inProgress
-        })
+            }
+        };
+
+        if(req.query.inprogress !== undefined){
+          searchCriteria['inProgress'] = req.query.inprogress==='true';
+        }
+        TimePunchCard
+        .find(searchCriteria)
         .sort('date')
         .exec(function(err, entries){
             if (err) {
