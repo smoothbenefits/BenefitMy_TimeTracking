@@ -76,6 +76,32 @@ module.exports = function(app) {
         });
     });
 
+    // Get all time punch cards, including in progress ones
+    app.get('/api/v1/company/:token/time_punch_cards/all', function(req, res){
+        var dateRange = _getDatesFromParam(req.query);
+
+        var companyToken = req.params.token;
+        TimePunchCard
+        .find({
+            'employee.companyDescriptor': companyToken,
+            'date': {
+                $gte: dateRange.startDate,
+                $lte: dateRange.endDate
+            }
+        })
+        .sort('employee.personDescriptor')
+        .exec(function(err, entries){
+            if (err) {
+                res.status(400).send(err);
+                return;
+            }
+
+            res.setHeader('Cache-Control', 'no-cache');
+            res.json(entries);
+            return;
+        });
+    });
+
     app.get('/api/v1/time_punch_cards', function(req, res) {
         var dateRange = _getDatesFromParam(req.query);
 
@@ -126,7 +152,7 @@ module.exports = function(app) {
 
       // Since we are going to use person descriptor as lookup
       // to perform the update, Mongo will complain about "_id"
-      // and/or "__v" being presented on the new model, so we 
+      // and/or "__v" being presented on the new model, so we
       // have to clear those up.
       delete timePunchCardToUpdate._id;
       delete timePunchCardToUpdate.__v;
