@@ -52,17 +52,21 @@ module.exports = function(app) {
 
     app.get('/api/v1/company/:token/time_punch_cards', function(req, res){
         var dateRange = _getDatesFromParam(req.query);
-
         var companyToken = req.params.token;
-        TimePunchCard
-        .find({
+        var searchCriteria = {
             'employee.companyDescriptor': companyToken,
             'date': {
                 $gte: dateRange.startDate,
                 $lte: dateRange.endDate
-            },
-            'inProgress': {'$ne': true}
-        })
+            }
+        };
+
+        if(req.query.includeall !== 'true') {
+          searchCriteria['inProgress'] = {'$ne': true};
+        }
+
+        TimePunchCard
+        .find(searchCriteria)
         .sort('employee.personDescriptor')
         .exec(function(err, entries){
             if (err) {
@@ -126,7 +130,7 @@ module.exports = function(app) {
 
       // Since we are going to use person descriptor as lookup
       // to perform the update, Mongo will complain about "_id"
-      // and/or "__v" being presented on the new model, so we 
+      // and/or "__v" being presented on the new model, so we
       // have to clear those up.
       delete timePunchCardToUpdate._id;
       delete timePunchCardToUpdate.__v;
