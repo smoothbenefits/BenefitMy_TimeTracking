@@ -1,3 +1,4 @@
+var rest = require('restler');
 var TimeoffQuota = require('../models/timeoffQuota');
 var TimeoffAccrualService = require('../services/TimeoffAccrualService');
 
@@ -24,7 +25,7 @@ module.exports = function(app) {
 
         // Since we are going to use person descriptor as lookup
         // to perform the update, Mongo will complain about "_id"
-        // and/or "__v" being presented on the new model, so we 
+        // and/or "__v" being presented on the new model, so we
         // have to clear those up.
         delete newModel._id;
         delete newModel.__v;
@@ -63,7 +64,7 @@ module.exports = function(app) {
     app.post('/api/v1/timeoff_quotas', function(req, res) {
         var personDescriptor = req.body.personDescriptor;
         var companyDescriptor = req.body.companyDescriptor;
-        TimeoffQuota.findOneAndUpdate(   
+        TimeoffQuota.findOneAndUpdate(
             {
                 personDescriptor: personDescriptor,
                 companyDescriptor: companyDescriptor
@@ -79,8 +80,18 @@ module.exports = function(app) {
             });
     });
 
-    app.get('/api/v1/timeoff_quotas/execute_accrual', function(req, res) {
-        TimeoffAccrualService.ExecuteAccrualForAllRecords();
-        res.status(200).send('Accrual on all records completed!');
+    app.post('/api/v1/timeoff_quotas/execute_accrual', function(req, res) {
+        var messageId = req.body.MessageId;
+        var subscribeUrl = req.body.SubscribeURL;
+
+        // Confirm subscribtion to Amazon SNS topic if required
+        if (subscribeUrl) {
+            rest.get(subscribeUrl).on('complete', function(result) {
+              return res.status(201).send(result);
+            });
+        } else {
+          TimeoffAccrualService.ExecuteAccrualForAllRecords();
+          return res.status(200).send('Accrual on all records completed! Triggered by message ' + messageId);
+        }
     });
 };
