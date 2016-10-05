@@ -32,7 +32,8 @@
     "restler": "^3.4.0",
     "uglify-js": "~2.4.15",
     "underscore": "^1.8.3",
-    "watchify": "~3.6.1"
+    "watchify": "~3.6.1",
+    "mongoose-transaction": "0.0.3"
   },
   "browserify": {
     "transform": [
