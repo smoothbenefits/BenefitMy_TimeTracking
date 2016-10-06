@@ -10,6 +10,7 @@
     "start": "npm run watch & nodemon server.js"
   },
   "dependencies": {
+    "aws-sdk": "^2.6.6",
     "babel-core": "~6.3.26",
     "babel-loader": "~6.2.0",
     "babel-preset-es2015": "~6.3.13",
