@@ -20,7 +20,7 @@ var TimeoffQuotaSchema = new Schema({
             lastAccrualTimestamp: { type: Date, default: Date.now }
         }
     }],
-    createdTimestamp: { type: Date },
+    createdTimestamp: { type: Date, default: Date.now },
     modifiedTimestamp: { type: Date, default: Date.now }
 });
 

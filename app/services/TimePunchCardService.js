@@ -60,6 +60,18 @@ var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
     return attribute.name === 'State';
   });
 
+  var city = _.find(punchCard.attributes, function(attribute) {
+    return attribute.name === 'City';
+  });
+
+  var formattedAddress = _.find(punchCard.attributes, function(attribute) {
+    return attribute.name === 'FormattedAddress';
+  });
+
+  var addressComponent = _.find(punchCard.attributes, function(attribute) {
+    return attribute.name === 'AddressComponent';
+  });
+
   if (coordinates && coordinates.value) {
     LocationService.ReverseGeocodeCoordinate(
       coordinates.value.latitude,
@@ -67,6 +79,8 @@ var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
       function(address) {
         if (state && state.value && state.value != address.state.long_name) {
           error('Location provided does not match existing state value.');
+        } else if (city && city.value && city.value != address.city.long_name) {
+          error('Location provided does not match existing city value.');
         } else {
           if (!state || !state.value) {
             // Add state
@@ -76,11 +90,29 @@ var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
             });
           }
 
-          // Add formatted address
-          punchCard.attributes.push({
-            'name': 'FormattedAddress',
-            'value': address.formatted_address
-          });
+          if (!city || !city.value) {
+            // Add city
+            punchCard.attributes.push({
+              'name': 'City',
+              'value': address.city.long_name
+            })
+          }
+
+          if (!formattedAddress || !formattedAddress.value) {
+            // Add formatted address
+            punchCard.attributes.push({
+              'name': 'FormattedAddress',
+              'value': address.formatted_address
+            });
+          }
+
+          if (!addressComponent || !addressComponent.value) {
+            // Add formatted address
+            punchCard.attributes.push({
+              'name': 'AddressComponent',
+              'value': address.address_component
+            });
+          }
 
           success(punchCard);
 

@@ -21,9 +21,14 @@ var ReverseGeocodeCoordinate = function(latitude, longitude, success, error) {
           var state = _.find(result.address_components, function(component) {
             return _.contains(component.types, 'administrative_area_level_1');
           });
+          var city = _.find(result.address_components, function(component) {
+            return _.contains(component.types, 'locality');
+          });
 
           success({
             'formatted_address': result.formatted_address,
+            'address_component': result.address_components,
+            'city': city,
             'state': state
           });
           return;
