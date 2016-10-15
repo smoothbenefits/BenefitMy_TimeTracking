@@ -58,7 +58,7 @@ var _executeAccrualForQuotaInfo = function(timeoffQuotaRecordId, quotaInfoItem) 
     // Get the appropriate strategy and compute the value for accrual
     var accrualStrategy = AccrualFrequencyStrategyMapping[quotaInfoItem.accrualSpecs.accrualFrequency];
     var accrualValue = accrualStrategy.CalculateAccuralValue(
-            quotaInfoItem.annualTargetHours,
+            quotaInfoItem.accrualSpecs.accrualRate,
             quotaInfoItem.accrualSpecs.lastAccrualTimestamp
         );
 
@@ -83,8 +83,8 @@ var _canAccrualQuotaRecord = function(timeoffQuotaRecord) {
 var _canAccrualQuotaInfo = function(timeoffQuotaInfo) {
     return timeoffQuotaInfo
         && timeoffQuotaInfo._id
-        && timeoffQuotaInfo.annualTargetHours
         && timeoffQuotaInfo.accrualSpecs
+        && timeoffQuotaInfo.accrualSpecs.accrualRate
         && AccrualFrequencyStrategyMapping[timeoffQuotaInfo.accrualSpecs.accrualFrequency];
 };
 

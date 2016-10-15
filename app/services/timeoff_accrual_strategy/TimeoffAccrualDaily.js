@@ -1,6 +1,6 @@
 var moment = require('moment');
 
-var CalculateAccuralValue = function(annualTarget, lastAccrualTimestamp) {
+var CalculateAccuralValue = function(accrualRate, lastAccrualTimestamp) {
     
     // if last accrual time stamp is not set on a record, just 
     // assume that now is the start point of accrual. 
@@ -10,7 +10,7 @@ var CalculateAccuralValue = function(annualTarget, lastAccrualTimestamp) {
         return 0.0;
     }
 
-    if (!annualTarget) {
+    if (!accrualRate) {
         return null;
     }
 
@@ -21,7 +21,7 @@ var CalculateAccuralValue = function(annualTarget, lastAccrualTimestamp) {
     var numDaysInYear = _getNumDaysInCurrentYear();
 
     if (diffNumDay > 0) {
-        return (annualTarget / numDaysInYear) * diffNumDay;
+        return accrualRate * diffNumDay;
     }
 
     return null;
