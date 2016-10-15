@@ -13,9 +13,9 @@ db.timeoffquotas.find({}).forEach(
                 throw new Error('accrualSpecs');
             } 
             if (quotaEntry.accrualSpecs.accrualFrequency == 'Monthly') {
-                accrualRate = quotaEntry.annualTargetHours / 12.0;
+                accrualRate = (quotaEntry.annualTargetHours / 12.0).toFixed(4);
             } else if (quotaEntry.accrualSpecs.accrualFrequency == 'Daily') {
-                accrualRate = quotaEntry.annualTargetHours / 365.0;
+                accrualRate = quotaEntry.annualTargetHours / 365.0.toFixed(4);
             } else {
                 continue;
             }
