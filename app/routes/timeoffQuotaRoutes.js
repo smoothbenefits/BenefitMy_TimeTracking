@@ -93,7 +93,7 @@ module.exports = function(app) {
               return res.status(201).send(result);
             });
         } else {
-          TimeoffAccrualService.ExecuteAccrualForAllRecords();
+          TimeoffAccrualService.ExecutePeriodicAccrualForAllRecords();
           return res.status(200).send('Accrual on all records completed! Triggered by message ' + messageId);
         }
     });

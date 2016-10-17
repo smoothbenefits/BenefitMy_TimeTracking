@@ -1,4 +1,5 @@
 var moment = require('moment');
+var TimeoffAccrualStrategyTypes = require('./TimeoffAccrualStrategyTypes');
 
 var CalculateAccuralValue = function(accrualRate, lastAccrualTimestamp) {
     
@@ -27,5 +28,6 @@ var CalculateAccuralValue = function(accrualRate, lastAccrualTimestamp) {
 };
 
 module.exports = {
+    TimeoffAccrualStrategyType: TimeoffAccrualStrategyTypes.Periodic,
     CalculateAccuralValue: CalculateAccuralValue
 };

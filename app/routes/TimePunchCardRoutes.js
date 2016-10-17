@@ -1,6 +1,7 @@
 var moment = require('moment');
 var TimePunchCard = require('../models/timePunchCard');
 var TimePunchCardService = require('../services/TimePunchCardService');
+var TimeoffAccrualService = require('../services/TimeoffAccrualService');
 
 module.exports = function(app) {
 
@@ -114,6 +115,12 @@ module.exports = function(app) {
             return;
           }
 
+          // Perform real time accrual, if appropriate
+          var workHours = TimePunchCardService.getWorkHoursFromCard(createdEntry);
+          if (workHours) {
+            TimeoffAccrualService.PerformHourlyAccrual(createdEntry.employee.personDescriptor, workHours);
+          }
+
           res.json(createdEntry);
           return;
         });
@@ -137,18 +144,43 @@ module.exports = function(app) {
 
       TimePunchCardService.parsePunchCardWithGeoCoordinate(req.body, function(parsed) {
         // success callback
-        TimePunchCard
-        .findOneAndUpdate(
-            {_id:id},
-            timePunchCardToUpdate,
-            function(err, resultCard) {
-          if (err) {
-            res.status(400).send(err);
-            return;
-          }
 
-          res.json([resultCard]);
-          return;
+        // [TODO]
+        // It is weird that we use both a findById and then another 
+        // findOneAndUpdated here. Though I could not find a much better
+        // way to achieve the need of both the before and the after documents
+        // of this update.
+        // If we found a better way here, this should be revised.
+        TimePunchCard
+        .findById(id, function(err, originalCard) {
+            if (err) {
+                res.status(400).send(err);
+                return;
+            }
+
+            TimePunchCard
+            .findOneAndUpdate(
+                {_id:id},
+                timePunchCardToUpdate,
+                function(err, resultCard) {
+              if (err) {
+                res.status(400).send(err);
+                return;
+              }
+
+              // Perform real time accrual, if appropriate
+              // For card update, this is to account for the diff between the original 
+              // and the updated cards
+              var originalWorkHours = TimePunchCardService.getWorkHoursFromCard(originalCard);
+              var updatedWorkHours = TimePunchCardService.getWorkHoursFromCard(resultCard);
+              if (originalWorkHours != null && updatedWorkHours != null) {
+                var diffWorkHours = updatedWorkHours - originalWorkHours;
+                TimeoffAccrualService.PerformHourlyAccrual(resultCard.employee.personDescriptor, diffWorkHours);
+              }
+
+              res.json([resultCard]);
+              return;
+            });
         });
       }, function(err) {
         //error callback
@@ -159,10 +191,20 @@ module.exports = function(app) {
     app.delete('/api/v1/time_punch_cards/:id', function(req, res) {
       var id = req.params.id;
 
-      TimePunchCard.findByIdAndRemove(id, function(err) {
+      TimePunchCard.findByIdAndRemove(id, function(err, deletedCard) {
         if (err) {
           res.status(404).send(err);
           return;
+        }
+
+        // Perform real time accrual, if appropriate
+        var workHours = TimePunchCardService.getWorkHoursFromCard(deletedCard);
+        if (workHours) {
+            // We are to de-accrual the deleted card working hours
+            // This is assuming that the hours captures were accrued
+            // previously
+            workHours = workHours * -1.0;
+            TimeoffAccrualService.PerformHourlyAccrual(deletedCard.employee.personDescriptor, workHours);
         }
 
         res.json({ message: 'Successfully deleted' });

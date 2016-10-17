@@ -1,4 +1,5 @@
 var moment = require('moment');
+var TimeoffAccrualStrategyTypes = require('./TimeoffAccrualStrategyTypes');
 
 var CalculateAccuralValue = function(accrualRate, lastAccrualTimestamp) {
     
@@ -35,5 +36,6 @@ var _getNumDaysInCurrentYear = function() {
 };
 
 module.exports = {
+    TimeoffAccrualStrategyType: TimeoffAccrualStrategyTypes.Periodic,
     CalculateAccuralValue: CalculateAccuralValue
 };

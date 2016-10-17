@@ -1,9 +1,10 @@
 Done * Update schema 
 Done * Script to back convert existing data
 Done * Update existing accrual logic
-* Find all places reference AnnualTargetHours and convert 
+Done * Find all places reference AnnualTargetHours and convert 
   Done * In Time Tracking Service 
-  * In main app
+  Done * In main app
+Done * Update main app to support quota specification by hourly
+Done * Update onboarding data collection form
+Done * Update utility to import timeoff quota data
 * New Accrual logic to handle hourly case
-* Update onboarding data collection form
-* Update utility to import timeoff quota data
