@@ -1,6 +1,7 @@
 var moment = require('moment');
+var TimeoffAccrualStrategyTypes = require('./TimeoffAccrualStrategyTypes');
 
-var CalculateAccuralValue = function(annualTarget, lastAccrualTimestamp) {
+var CalculateAccuralValue = function(accrualRate, lastAccrualTimestamp) {
     
     // if last accrual time stamp is not set on a record, just 
     // assume that now is the start point of accrual. 
@@ -10,7 +11,7 @@ var CalculateAccuralValue = function(annualTarget, lastAccrualTimestamp) {
         return 0.0;
     }
 
-    if (!annualTarget) {
+    if (!accrualRate) {
         return null;
     }
 
@@ -20,12 +21,13 @@ var CalculateAccuralValue = function(annualTarget, lastAccrualTimestamp) {
     var diffNumMonth = currentMonthStart.diff(lastAccrualMonthStart, 'month', true);
 
     if (diffNumMonth > 0) {
-        return (annualTarget / 12.0) * diffNumMonth;
+        return accrualRate * diffNumMonth;
     }
 
     return null;
 };
 
 module.exports = {
+    TimeoffAccrualStrategyType: TimeoffAccrualStrategyTypes.Periodic,
     CalculateAccuralValue: CalculateAccuralValue
 };
