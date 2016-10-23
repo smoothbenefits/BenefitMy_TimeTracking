@@ -2,6 +2,15 @@ var _ = require('underscore');
 var moment = require('moment');
 var LocationService = require('./LocationService');
 
+
+var TimeoffTypes = {
+    WorkTime: 'Work Time',
+    CompanyHoliday: 'Company Holiday',
+    PaidTimeOff: 'Paid Time Off',
+    SickTime: 'Sick Time',
+    PersonalLeave: 'Personal Leave'
+};
+
 var splitCrossDatesPunchCard = function(punchCard) {
   var start = moment(punchCard.start);
   var end = moment(punchCard.end);
@@ -127,9 +136,34 @@ var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
     // if coordinate is not provided, continue the process on success route
     success(punchCard);
   }
-}
+};
+
+var getWorkHoursFromCard = function(punchCard) {
+    if (punchCard.recordType != TimeoffTypes.WorkTime) {
+        return 0.0;
+    }
+    return _getCardTimeSpanInHours(punchCard);
+};
+
+var _getCardTimeSpanInHours = function(punchCard) {
+    if (!punchCard) {
+        return null;
+    }
+
+    if (punchCard.inProgress) {
+        return null;
+    }
+
+    var start = moment(punchCard.start);
+    var end = moment(punchCard.end);
+    var duration = moment.duration(end.diff(start));
+    var hours = duration.asHours();
+
+    return hours;
+};
 
 module.exports = {
   splitCrossDatesPunchCard: splitCrossDatesPunchCard,
-  parsePunchCardWithGeoCoordinate: parsePunchCardWithGeoCoordinate
+  parsePunchCardWithGeoCoordinate: parsePunchCardWithGeoCoordinate,
+  getWorkHoursFromCard: getWorkHoursFromCard
 };
