@@ -22,6 +22,7 @@ module.exports = mongoose.model('TimePunchCard', {
     attributes: [ AttributeSchema ],
     start: { type: Date },
     end: { type: Date },
+    inHours: { type: Boolean },
     recordType: { type: String, required: true },
     inProgress: { type: Boolean },
     createdTimestamp: { type: Date, default: Date.now },
