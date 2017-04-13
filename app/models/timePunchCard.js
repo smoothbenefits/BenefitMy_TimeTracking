@@ -26,5 +26,35 @@ module.exports = mongoose.model('TimePunchCard', {
     recordType: { type: String, required: true },
     inProgress: { type: Boolean },
     createdTimestamp: { type: Date, default: Date.now },
-    updatedTimestamp: { type: Date, default: Date.now }
+    updatedTimestamp: { type: Date, default: Date.now },
+    checkInAssets: {
+        imageDetectionAsset: {
+            referenceImageAsset: {
+                url: { type: String },
+                bucketName: { type: String },
+                objectKey: { type: String }
+            },
+            realTimeImageAsset: {
+                url: { type: String },
+                bucketName: { type: String },
+                objectKey: { type: String }
+            },
+            confidence: { type: Number }
+        }
+    },
+    checkOutAssets: {
+        imageDetectionAsset: {
+            referenceImageAsset: {
+                url: { type: String },
+                bucketName: { type: String },
+                objectKey: { type: String }
+            },
+            realTimeImageAsset: {
+                url: { type: String },
+                bucketName: { type: String },
+                objectKey: { type: String }
+            },
+            confidence: { type: Number }
+        }
+    },
 });
