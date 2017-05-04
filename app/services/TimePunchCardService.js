@@ -1,7 +1,9 @@
 var _ = require('underscore');
 var moment = require('moment');
 var LocationService = require('./LocationService');
-
+var appSettings = require('../settings/appSettings');
+var AWSSNSPublisher = require('./aws/SNSPublisher');
+var PunchCardRecognitionFailedEvent = require('./aws/PunchCardRecognitionFailedEvent');
 
 var TimeoffTypes = {
     WorkTime: 'Work Time',
@@ -56,7 +58,7 @@ var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
             punchCard.attributes.push({
               'name': 'City',
               'value': address.city.long_name
-            })
+            });
           }
 
           if (!formattedAddress || !formattedAddress.value) {
@@ -114,7 +116,38 @@ var _getCardTimeSpanInHours = function(punchCard) {
     return hours;
 };
 
+var isRecognitionFailed = function(punchCard){
+  if (!punchCard){
+    return false;
+  }
+
+  if (punchCard.inProgress && punchCard.checkInAssets && punchCard.checkInAssets.imageDetectionAsset){
+    return punchCard.checkInAssets.imageDetectionAsset.confidence < appSettings.punchCardRecognitionConfidenceThreshold;
+  }
+  else if (!punchCard.inProgress && punchCard.checkOutAssets && punchCard.checkOutAssets.imageDetectionAsset){
+    return punchCard.checkOutAssets.imageDetectionAsset.confidence < appSettings.punchCardRecognitionConfidenceThreshold;
+  }
+  return false;
+};
+
+var raisePunchCardRecognitionFailedEvent = function(punchCard){
+  if (!punchCard){
+    return;
+  }
+
+  if(!(punchCard.checkInAssets && punchCard.checkInAssets.imageDetectionAsset) && 
+     !(punchCard.checkOutAssets && punchCard.checkOutAssets.imageDetectionAsset)){
+    return;
+  }
+  //Now let's publish the event!
+  var event = PunchCardRecognitionFailedEvent.CreateEvent(punchCard);
+  AWSSNSPublisher.Publish(event);
+};
+
+
 module.exports = {
   parsePunchCardWithGeoCoordinate: parsePunchCardWithGeoCoordinate,
-  getWorkHoursFromCard: getWorkHoursFromCard
+  getWorkHoursFromCard: getWorkHoursFromCard,
+  isRecognitionFailed: isRecognitionFailed,
+  raisePunchCardRecognitionFailedEvent: raisePunchCardRecognitionFailedEvent
 };
