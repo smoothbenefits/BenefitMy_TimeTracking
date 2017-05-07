@@ -1,10 +1,10 @@
 var AWS = require('aws-sdk');
 AWS.config.update({region: 'us-west-2'});
 
-var Publish = function(event) {
+var Publish = function(topic, event) {
   var SNSClient = new AWS.SNS({apiVersion: '2010-03-31'});
   var params = {
-    Name: event.topicName,
+    Name: topic,
   };
   //First, ensure the topic we are publishing the event to is created
   SNSClient.createTopic(params, function(err, data){
@@ -14,7 +14,7 @@ var Publish = function(event) {
     else{
       var arn = data.TopicArn;
       var params = {
-        Message: JSON.stringify(event.message),
+        Message: JSON.stringify(event),
         TopicArn: arn
       };
       SNSClient.publish(params, function(err, data) {

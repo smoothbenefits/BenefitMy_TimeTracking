@@ -3,7 +3,8 @@ var moment = require('moment');
 var LocationService = require('./LocationService');
 var appSettings = require('../settings/appSettings');
 var AWSSNSPublisher = require('./aws/SNSPublisher');
-var PunchCardRecognitionFailedEvent = require('./aws/PunchCardRecognitionFailedEvent');
+var AWSSNSUtilty = require('./aws/SNSUtility');
+var PunchCardRecognitionFailedEventFactory = require('./event_factories/PunchCardRecognitionFailedEventFactory');
 
 var TimeoffTypes = {
     WorkTime: 'Work Time',
@@ -120,12 +121,13 @@ var isRecognitionFailed = function(punchCard){
   if (!punchCard){
     return false;
   }
-
+  var threshold = process.env.PunchCardRecognitionConfidenceThreshold || 
+    appSettings.defaultPunchCardRecognitionConfidenceThreshold;
   if (punchCard.inProgress && punchCard.checkInAssets && punchCard.checkInAssets.imageDetectionAsset){
-    return punchCard.checkInAssets.imageDetectionAsset.confidence < appSettings.punchCardRecognitionConfidenceThreshold;
+    return punchCard.checkInAssets.imageDetectionAsset.confidence < threshold;
   }
   else if (!punchCard.inProgress && punchCard.checkOutAssets && punchCard.checkOutAssets.imageDetectionAsset){
-    return punchCard.checkOutAssets.imageDetectionAsset.confidence < appSettings.punchCardRecognitionConfidenceThreshold;
+    return punchCard.checkOutAssets.imageDetectionAsset.confidence < threshold;
   }
   return false;
 };
@@ -140,8 +142,9 @@ var raisePunchCardRecognitionFailedEvent = function(punchCard){
     return;
   }
   //Now let's publish the event!
-  var event = PunchCardRecognitionFailedEvent.CreateEvent(punchCard);
-  AWSSNSPublisher.Publish(event);
+  var topicName = AWSSNSUtilty.GetTopicName(punchCard);
+  var event = PunchCardRecognitionFailedEventFactory.BuildEvent(punchCard);
+  AWSSNSPublisher.Publish(topicName, event);
 };
 
 
