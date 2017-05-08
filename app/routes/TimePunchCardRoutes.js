@@ -121,6 +121,11 @@ module.exports = function(app) {
             TimeoffAccrualService.PerformHourlyAccrual(createdEntry.employee.personDescriptor, workHours);
           }
 
+          // Send the photo matching failure email if neccessary
+          if (TimePunchCardService.isRecognitionFailed(createdEntry)){
+            TimePunchCardService.raisePunchCardRecognitionFailedEvent(createdEntry);
+          }
+
           res.json(createdEntry);
           return;
         });
@@ -178,6 +183,10 @@ module.exports = function(app) {
                 TimeoffAccrualService.PerformHourlyAccrual(resultCard.employee.personDescriptor, diffWorkHours);
               }
 
+              // Send the photo matching failure email if neccessary
+              if (TimePunchCardService.isRecognitionFailed(resultCard)){
+                TimePunchCardService.raisePunchCardRecognitionFailedEvent(resultCard);
+              }
               res.json([resultCard]);
               return;
             });

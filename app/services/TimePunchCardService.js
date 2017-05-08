@@ -1,7 +1,10 @@
 var _ = require('underscore');
 var moment = require('moment');
 var LocationService = require('./LocationService');
-
+var appSettings = require('../settings/appSettings');
+var AWSSNSPublisher = require('./aws/SNSPublisher');
+var AWSSNSUtilty = require('./aws/SNSUtility');
+var PunchCardRecognitionFailedEventFactory = require('./event_factories/PunchCardRecognitionFailedEventFactory');
 
 var TimeoffTypes = {
     WorkTime: 'Work Time',
@@ -56,7 +59,7 @@ var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
             punchCard.attributes.push({
               'name': 'City',
               'value': address.city.long_name
-            })
+            });
           }
 
           if (!formattedAddress || !formattedAddress.value) {
@@ -114,7 +117,40 @@ var _getCardTimeSpanInHours = function(punchCard) {
     return hours;
 };
 
+var isRecognitionFailed = function(punchCard){
+  if (!punchCard){
+    return false;
+  }
+  var threshold = process.env.PunchCardRecognitionConfidenceThreshold || 
+    appSettings.defaultPunchCardRecognitionConfidenceThreshold;
+  if (punchCard.inProgress && punchCard.checkInAssets && punchCard.checkInAssets.imageDetectionAsset){
+    return punchCard.checkInAssets.imageDetectionAsset.confidence < threshold;
+  }
+  else if (!punchCard.inProgress && punchCard.checkOutAssets && punchCard.checkOutAssets.imageDetectionAsset){
+    return punchCard.checkOutAssets.imageDetectionAsset.confidence < threshold;
+  }
+  return false;
+};
+
+var raisePunchCardRecognitionFailedEvent = function(punchCard){
+  if (!punchCard){
+    return;
+  }
+
+  if(!(punchCard.checkInAssets && punchCard.checkInAssets.imageDetectionAsset) && 
+     !(punchCard.checkOutAssets && punchCard.checkOutAssets.imageDetectionAsset)){
+    return;
+  }
+  //Now let's publish the event!
+  var event = PunchCardRecognitionFailedEventFactory.BuildEvent(punchCard);
+  var topicName = AWSSNSUtilty.GetTopicName(event);
+  AWSSNSPublisher.Publish(topicName, event.message);
+};
+
+
 module.exports = {
   parsePunchCardWithGeoCoordinate: parsePunchCardWithGeoCoordinate,
-  getWorkHoursFromCard: getWorkHoursFromCard
+  getWorkHoursFromCard: getWorkHoursFromCard,
+  isRecognitionFailed: isRecognitionFailed,
+  raisePunchCardRecognitionFailedEvent: raisePunchCardRecognitionFailedEvent
 };
