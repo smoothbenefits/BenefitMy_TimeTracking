@@ -142,9 +142,9 @@ var raisePunchCardRecognitionFailedEvent = function(punchCard){
     return;
   }
   //Now let's publish the event!
-  var topicName = AWSSNSUtilty.GetTopicName(punchCard);
   var event = PunchCardRecognitionFailedEventFactory.BuildEvent(punchCard);
-  AWSSNSPublisher.Publish(topicName, event);
+  var topicName = AWSSNSUtilty.GetTopicName(event);
+  AWSSNSPublisher.Publish(topicName, event.message);
 };
 
 
