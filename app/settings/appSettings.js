@@ -9,5 +9,7 @@ module.exports = {
         appSupportEmailAddress: 'support@workbenefits.me'
     },
 
-    mainAppSiteUrl : 'http://app.workbenefits.me/'
+    mainAppSiteUrl : 'http://app.workbenefits.me/',
+
+    defaultPunchCardRecognitionConfidenceThreshold: 60
 };
