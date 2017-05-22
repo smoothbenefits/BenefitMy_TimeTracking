@@ -1,18 +1,24 @@
+var TimeoffAccrualAnnual = require('./timeoff_accrual_strategy/TimeoffAccrualAnnual');
 var TimeoffAccrualMonthly = require('./timeoff_accrual_strategy/TimeoffAccrualMonthly');
 var TimeoffAccrualDaily = require('./timeoff_accrual_strategy/TimeoffAccrualDaily');
 var TimeoffAccrualHourly = require('./timeoff_accrual_strategy/TimeoffAccrualHourly');
+var TimeoffAccrualWeekly = require('./timeoff_accrual_strategy/TimeoffAccrualWeekly');
 var TimeoffAccrualStrategyTypes = require('./timeoff_accrual_strategy/TimeoffAccrualStrategyTypes');
 var TimeoffQuota = require('../models/timeoffQuota');
 
 var AccrualFrequencyTypes = {
     Monthly: 'Monthly',
     Daily: 'Daily',
-    Hourly: 'Hourly'
+    Hourly: 'Hourly',
+    Weekly: 'Weekly',
+    Annual: 'Annual'
 };
 
 var AccrualFrequencyStrategyMapping = {
 };
+AccrualFrequencyStrategyMapping[AccrualFrequencyTypes.Annual] = TimeoffAccrualAnnual;
 AccrualFrequencyStrategyMapping[AccrualFrequencyTypes.Monthly] = TimeoffAccrualMonthly;
+AccrualFrequencyStrategyMapping[AccrualFrequencyTypes.Weekly] = TimeoffAccrualWeekly;
 AccrualFrequencyStrategyMapping[AccrualFrequencyTypes.Daily] = TimeoffAccrualDaily;
 AccrualFrequencyStrategyMapping[AccrualFrequencyTypes.Hourly] = TimeoffAccrualHourly;
 
