@@ -7,6 +7,7 @@ var bodyParser     = require('body-parser');
 var methodOverride = require('method-override');
 var mongoose       = require('mongoose');
 var fs			       = require('fs');
+var sqs            = require('./app/messagePolling');
 
 // configuration ===========================================
 
@@ -60,6 +61,8 @@ app.listen(port);
 
 // shoutout to the user
 console.log('PTO Service is listening on port ' + port);
+
+
 
 // expose app
 exports = module.exports = app;
