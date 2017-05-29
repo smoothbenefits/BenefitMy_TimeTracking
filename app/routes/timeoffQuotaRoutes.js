@@ -1,6 +1,5 @@
 var mongoose = require('mongoose');
 var Transaction = require('mongoose-transaction')(mongoose);
-var rest = require('restler');
 var TimeoffQuota = require('../models/timeoffQuota');
 var TimeoffAccrualService = require('../services/TimeoffAccrualService');
 
@@ -83,19 +82,9 @@ module.exports = function(app) {
             });
     });
 
-    app.post('/api/v1/timeoff_quotas/execute_accrual', function(req, res) {
-        var messageId = req.body.MessageId;
-        var subscribeUrl = req.body.SubscribeURL;
-
-        // Confirm subscribtion to Amazon SNS topic if required
-        if (subscribeUrl) {
-            rest.get(subscribeUrl).on('complete', function(result) {
-              return res.status(201).send(result);
-            });
-        } else {
-          TimeoffAccrualService.ExecutePeriodicAccrualForAllRecords();
-          return res.status(200).send('Accrual on all records completed! Triggered by message ' + messageId);
-        }
+    app.get('/api/v1/timeoff_quotas/execute_accrual', function(req, res) {
+        TimeoffAccrualService.ExecutePeriodicAccrualForAllRecords();
+        return res.status(200).send('Accrual on all records completed!');
     });
 
     app.put('/api/v1/timeoff_quotas/batch', function(req, res){
