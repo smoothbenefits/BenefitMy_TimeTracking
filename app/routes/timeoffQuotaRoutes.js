@@ -84,7 +84,7 @@ module.exports = function(app) {
 
     app.get('/api/v1/timeoff_quotas/execute_accrual', function(req, res) {
         TimeoffAccrualService.ExecutePeriodicAccrualForAllRecords();
-        return res.status(200).send('Accrual on all records completed! Triggered by message ' + messageId);
+        return res.status(200).send('Accrual on all records completed!');
     });
 
     app.put('/api/v1/timeoff_quotas/batch', function(req, res){
