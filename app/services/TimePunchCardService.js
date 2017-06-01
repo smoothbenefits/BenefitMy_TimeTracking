@@ -134,11 +134,13 @@ var isRecognitionFailed = function(punchCard){
 
 var raisePunchCardRecognitionFailedEvent = function(punchCard){
   if (!punchCard){
+    console.log("Invalid punch card passed into Raise Event function");
     return;
   }
 
   if(!(punchCard.checkInAssets && punchCard.checkInAssets.imageDetectionAsset) && 
      !(punchCard.checkOutAssets && punchCard.checkOutAssets.imageDetectionAsset)){
+    console.log("PunchCard do not contain imageDetectionAsset!");
     return;
   }
   //Now let's publish the event!
