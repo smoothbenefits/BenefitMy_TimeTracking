@@ -23,22 +23,6 @@ var applyApprovedRequestToBankedBalance = function(timeoffRequest) {
 
 module.exports = function(app) {
 
-    app.get('/api/v1/timeoffs', function(req, res) {
-        Timeoff
-        .find()
-        .sort('requestTimestamp')
-        .exec(function(err, timeoffs){
-            if (err) {
-                res.send(err);
-                return;
-            }
-
-            res.setHeader('Cache-Control', 'no-cache');
-            res.json(timeoffs);
-        });
-
-    });
-
     app.get('/api/v1/requestor/:token/timeoffs', function(req, res) {
         var token = req.params.token;
         Timeoff
