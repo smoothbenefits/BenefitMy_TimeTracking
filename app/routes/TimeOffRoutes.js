@@ -6,7 +6,8 @@ var TimeoffStatus = {
     Approved: 'APPROVED',
     Pending: 'PENDING',
     Canceled: 'CANCELED',
-    Denied: 'DENIED'
+    Denied: 'DENIED',
+    Revoked: 'REVOKED'
 };
 
 var applyApprovedRequestToBankedBalance = function(timeoffRequest) {
@@ -19,6 +20,26 @@ var applyApprovedRequestToBankedBalance = function(timeoffRequest) {
         timeoffRequest.type,
         -timeoffRequest.duration
     );
+};
+
+var applyRevokedRequestToBankedBalance = function(timeoffRequest) {
+    if (timeoffRequest.status != TimeoffStatus.Revoked) {
+        return;
+    }
+
+    TimeoffAccrualService.ApplyValueDeltaToBankedBalance(
+        timeoffRequest.requestor.personDescriptor,
+        timeoffRequest.type,
+        timeoffRequest.duration
+    );
+};
+
+var applyRequestToBankedBalance = function(timeoffRequest) {
+    if (timeoffRequest.status == TimeoffStatus.Approved) {
+        applyApprovedRequestToBankedBalance(timeoffRequest);
+    } else if (timeoffRequest.status == TimeoffStatus.Revoked) {
+        applyRevokedRequestToBankedBalance(timeoffRequest);
+    }
 };
 
 module.exports = function(app) {
@@ -82,7 +103,8 @@ module.exports = function(app) {
             if (status != TimeoffStatus.Approved
                 && status != TimeoffStatus.Pending
                 && status != TimeoffStatus.Canceled
-                && status != TimeoffStatus.Denied) {
+                && status != TimeoffStatus.Denied
+                && status != TimeoffStatus.Revoked) {
                 res.status(400).send('Specified status is not of valid value.');
                 return;
             }
@@ -102,9 +124,12 @@ module.exports = function(app) {
             //  * Pending -> Approved
             //  * Pending -> Canceled
             //  * Pending -> Denied
+            //
+            //  * Approved -> Revoked
             if (!(status == TimeoffStatus.Approved && timeoff.status == TimeoffStatus.Pending)
                 && !(status == TimeoffStatus.Canceled && timeoff.status == TimeoffStatus.Pending)
-                && !(status == TimeoffStatus.Denied && timeoff.status == TimeoffStatus.Pending)) {
+                && !(status == TimeoffStatus.Denied && timeoff.status == TimeoffStatus.Pending)
+                && !(status == TimeoffStatus.Revoked && timeoff.status == TimeoffStatus.Approved)) {
 
                 res.status(409).send('Invalid state flow: "' + timeoff.status + '" to "' + status + '"');
                 return;
@@ -119,7 +144,7 @@ module.exports = function(app) {
                 }
 
                 // Apply to the user's available balance.
-                applyApprovedRequestToBankedBalance(savedTimeoff);
+                applyRequestToBankedBalance(savedTimeoff);
 
                 // Send notification email
                 emailService.sendTimeoffDecisionEmail(savedTimeoff);
