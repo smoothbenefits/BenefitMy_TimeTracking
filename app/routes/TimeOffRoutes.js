@@ -1,14 +1,14 @@
 var emailService = require('../services/EmailService');
 var TimeoffAccrualService = require('../services/TimeoffAccrualService');
+var TimePunchCardService = require('../services/TimePunchCardService');
 var Timeoff = require('../models/timeoff');
 
-var TimeoffStatus = {
-    Approved: 'APPROVED',
-    Pending: 'PENDING',
-    Canceled: 'CANCELED',
-    Denied: 'DENIED',
-    Revoked: 'REVOKED'
-};
+// For some reason, the destructuring form does not work. We should figure out later
+// but not a priority for now.
+var TimeoffService = require('../services/TimeoffService');
+var TimeoffStatus = TimeoffService.TimeoffStatus;
+var TimeoffTypes = TimeoffService.TimeoffTypes;
+
 
 var applyApprovedRequestToBankedBalance = function(timeoffRequest) {
     if (timeoffRequest.status != TimeoffStatus.Approved) {
@@ -148,6 +148,8 @@ module.exports = function(app) {
 
                 // Send notification email
                 emailService.sendTimeoffDecisionEmail(savedTimeoff);
+
+                TimePunchCardService.adjustTimeCardForTimeoffRecord(savedTimeoff);
 
                 res.setHeader('Cache-Control', 'no-cache');
                 res.json(savedTimeoff);

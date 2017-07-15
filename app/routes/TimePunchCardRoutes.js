@@ -109,26 +109,16 @@ module.exports = function(app) {
 
       TimePunchCardService.parsePunchCardWithGeoCoordinate(req.body, function(parsed) {
         // success callback
-        TimePunchCard.create(parsed, function(err, createdEntry) {
-          if (err) {
-            res.status(400).send(err);
-            return;
-          }
-
-          // Perform real time accrual, if appropriate
-          var workHours = TimePunchCardService.getWorkHoursFromCard(createdEntry);
-          if (workHours) {
-            TimeoffAccrualService.PerformHourlyAccrual(createdEntry.employee.personDescriptor, workHours);
-          }
-
-          // Send the photo matching failure email if neccessary
-          if (TimePunchCardService.isRecognitionFailed(createdEntry)){
-            TimePunchCardService.raisePunchCardRecognitionFailedEvent(createdEntry);
-          }
-
-          res.json(createdEntry);
-          return;
-        });
+        TimePunchCardService.createTimeCard(parsed, 
+            function(createdEntry) {
+                res.json(createdEntry);
+                return;
+            },
+            function(error) {
+                res.status(400).send(err);
+                return;
+            }
+        );
       }, function(err) {
         //error callback
         return res.status(400).send(err);
@@ -138,59 +128,22 @@ module.exports = function(app) {
     app.put('/api/v1/time_punch_cards/:id', function(req, res){
       var id = req.params.id;
       var timePunchCardToUpdate = req.body
-      timePunchCardToUpdate.updatedTimestamp = Date.now();
-
-      // Since we are going to use person descriptor as lookup
-      // to perform the update, Mongo will complain about "_id"
-      // and/or "__v" being presented on the new model, so we
-      // have to clear those up.
-      delete timePunchCardToUpdate._id;
-      delete timePunchCardToUpdate.__v;
-
-      TimePunchCardService.parsePunchCardWithGeoCoordinate(req.body, function(parsed) {
+      
+      TimePunchCardService.parsePunchCardWithGeoCoordinate(timePunchCardToUpdate, function(parsed) {
         // success callback
 
-        // [TODO]
-        // It is weird that we use both a findById and then another 
-        // findOneAndUpdated here. Though I could not find a much better
-        // way to achieve the need of both the before and the after documents
-        // of this update.
-        // If we found a better way here, this should be revised.
-        TimePunchCard
-        .findById(id, function(err, originalCard) {
-            if (err) {
+        TimePunchCardService.updateTimeCard(
+            id,
+            parsed,
+            function(resultCard) {
+                res.json([resultCard]);
+                return;
+            },
+            function(error) {
                 res.status(400).send(err);
                 return;
             }
-
-            TimePunchCard
-            .findOneAndUpdate(
-                {_id:id},
-                timePunchCardToUpdate,
-                function(err, resultCard) {
-              if (err) {
-                res.status(400).send(err);
-                return;
-              }
-
-              // Perform real time accrual, if appropriate
-              // For card update, this is to account for the diff between the original 
-              // and the updated cards
-              var originalWorkHours = TimePunchCardService.getWorkHoursFromCard(originalCard);
-              var updatedWorkHours = TimePunchCardService.getWorkHoursFromCard(resultCard);
-              if (originalWorkHours != null && updatedWorkHours != null) {
-                var diffWorkHours = updatedWorkHours - originalWorkHours;
-                TimeoffAccrualService.PerformHourlyAccrual(resultCard.employee.personDescriptor, diffWorkHours);
-              }
-
-              // Send the photo matching failure email if neccessary
-              if (TimePunchCardService.isRecognitionFailed(resultCard)){
-                TimePunchCardService.raisePunchCardRecognitionFailedEvent(resultCard);
-              }
-              res.json([resultCard]);
-              return;
-            });
-        });
+        );
       }, function(err) {
         //error callback
         return res.status(400).send(err);
@@ -200,24 +153,16 @@ module.exports = function(app) {
     app.delete('/api/v1/time_punch_cards/:id', function(req, res) {
       var id = req.params.id;
 
-      TimePunchCard.findByIdAndRemove(id, function(err, deletedCard) {
-        if (err) {
-          res.status(404).send(err);
-          return;
+      TimePunchCardService.deleteTimeCard(
+        id,
+        function(deletedCard) {
+            res.json({ message: 'Successfully deleted' });
+            return;
+        },
+        function(error) {
+            res.status(404).send(err);
+            return;
         }
-
-        // Perform real time accrual, if appropriate
-        var workHours = TimePunchCardService.getWorkHoursFromCard(deletedCard);
-        if (workHours) {
-            // We are to de-accrual the deleted card working hours
-            // This is assuming that the hours captures were accrued
-            // previously
-            workHours = workHours * -1.0;
-            TimeoffAccrualService.PerformHourlyAccrual(deletedCard.employee.personDescriptor, workHours);
-        }
-
-        res.json({ message: 'Successfully deleted' });
-        return;
-      });
+      );
     });
 };

@@ -57,4 +57,7 @@ module.exports = mongoose.model('TimePunchCard', {
             confidence: { type: Number }
         }
     },
+    references: {
+        timeoffRecord: { type: mongoose.Schema.Types.ObjectId, ref: 'Timeoff', required: false }
+    }
 });
