@@ -1,3 +1,4 @@
+var moment = require('moment');
 var emailService = require('../services/EmailService');
 var TimeoffAccrualService = require('../services/TimeoffAccrualService');
 var TimePunchCardService = require('../services/TimePunchCardService');
@@ -40,6 +41,20 @@ var applyRequestToBankedBalance = function(timeoffRequest) {
     } else if (timeoffRequest.status == TimeoffStatus.Revoked) {
         applyRevokedRequestToBankedBalance(timeoffRequest);
     }
+};
+
+var getDatesFromParam = function(paramQuery){
+    // Start Date
+    var startDateParam = paramQuery.start_date;
+    var endDateParam = paramQuery.end_date;
+    if (startDateParam && endDateParam){
+        var dateRange = {
+            startDate: moment.utc(startDateParam).startOf('day'),
+            endDate: moment.utc(endDateParam).endOf('day')
+        };
+        return dateRange;
+    }
+    return null;
 };
 
 module.exports = function(app) {
@@ -154,6 +169,40 @@ module.exports = function(app) {
                 res.setHeader('Cache-Control', 'no-cache');
                 res.json(savedTimeoff);
             });
+        });
+    });
+
+    app.post('/api/v1/timeoff/list', function(req, res) {
+        // This is the api end point to retrieve a list of time off requests
+        // based on posted list of employees (Usually all employees in a company)
+        // and the date range specified in the query string
+        var dateRange = getDatesFromParam(req.query);
+        var employeeIdArray = req.body;
+        var filterStatus = req.query.status;
+
+        var searchCriteria = {
+            'requestor.personDescriptor': { $in: employeeIdArray},
+        };
+
+        if (dateRange){
+            searchCriteria['startDateTime'] = {
+                $gte: dateRange.startDate,
+                $lte: dateRange.endDate
+            };
+        }
+
+        if(filterStatus){
+            searchCriteria['status'] = filterStatus;
+        }
+
+        Timeoff.find(searchCriteria, function(err, timeoffs){
+            if (err) {
+                res.status(400).send(err);
+                return;
+            }
+
+            res.setHeader('Cache-Control', 'no-cache');
+            res.json(timeoffs);
         });
     });
 };
