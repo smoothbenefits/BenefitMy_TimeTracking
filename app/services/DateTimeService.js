@@ -11,7 +11,14 @@ var getDisplayDateTime = function(rawDateTime) {
     return moment(rawDateTime).format(DATE_TIME_FORMAT_STRING);
 };
 
+var computeDateTimeWithTimeSpan = function(startDateTime, spanHours) {
+    var start = moment(startDateTime);
+    var end = start.add(spanHours, 'hours').toDate();
+    return end;
+};
+
 module.exports = {
     getDisplayDateTime: getDisplayDateTime,
-    getDisplayDate: getDisplayDate
+    getDisplayDate: getDisplayDate,
+    computeDateTimeWithTimeSpan: computeDateTimeWithTimeSpan
 };

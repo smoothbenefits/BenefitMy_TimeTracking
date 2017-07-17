@@ -3,7 +3,7 @@ var appSettings = require('../settings/appSettings');
 var path = require('path');
 var emailTemplates = require('email-templates');
 var templatesDir = path.resolve(__dirname, '..', 'templates/emails');
-var commonUtilityService = require('./CommonUtilityService');
+var DateTimeService = require('./DateTimeService');
 
 // This is the SMTP configuration to be used by node-mailer
 var smtpConfig = {
@@ -117,7 +117,7 @@ var sendTimeoffDecisionEmail = function(requestModel) {
 
 var createMailContextFromTimeoffRequestModel = function(requestModel) {
     requestModel.startDateTimeForDisplay =
-        commonUtilityService.getDisplayDate(requestModel.startDateTime);
+        DateTimeService.getDisplayDate(requestModel.startDateTime);
     return {
         request: requestModel
     };
