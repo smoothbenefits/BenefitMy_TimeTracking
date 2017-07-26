@@ -15,6 +15,10 @@ module.exports = mongoose.model('Timeoff', {
         personDescriptor: {
             type: String,
             required: true
+        },
+        companyDescriptor: {
+            type: String,
+            required: false
         }
     },
     approver: {

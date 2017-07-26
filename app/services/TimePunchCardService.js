@@ -5,13 +5,135 @@ var appSettings = require('../settings/appSettings');
 var AWSSNSPublisher = require('./aws/SNSPublisher');
 var AWSSNSUtilty = require('./aws/SNSUtility');
 var PunchCardRecognitionFailedEventFactory = require('./event_factories/PunchCardRecognitionFailedEventFactory');
+var TimePunchCard = require('../models/timePunchCard');
 
-var TimeoffTypes = {
+// For some reason, the destructuring form does not work. We should figure out later
+// but not a priority for now.
+var TimeoffService = require('./TimeoffService');
+var TimeoffAccrualService = require('./TimeoffAccrualService');
+var TimeoffStatus = TimeoffService.TimeoffStatus;
+var TimeoffTypes = TimeoffService.TimeoffTypes;
+
+var TimeCardTypes = {
     WorkTime: 'Work Time',
     CompanyHoliday: 'Company Holiday',
     PaidTimeOff: 'Paid Time Off',
     SickTime: 'Sick Time',
     PersonalLeave: 'Personal Leave'
+};
+
+var createTimeCard = function(cardToCreate, successCallback, failureCallback) {
+    TimePunchCard.create(cardToCreate, function(err, createdEntry) {
+      if (err) {
+        if (failureCallback) {
+            failureCallback(err);
+        }
+        return;
+      }
+
+      // Perform real time accrual, if appropriate
+      var workHours = getWorkHoursFromCard(createdEntry);
+      if (workHours) {
+        TimeoffAccrualService.PerformHourlyAccrual(createdEntry.employee.personDescriptor, workHours);
+      }
+
+      // Send the photo matching failure email if neccessary
+      if (isRecognitionFailed(createdEntry)){
+        raisePunchCardRecognitionFailedEvent(createdEntry);
+      }
+
+      if (successCallback) {
+        successCallback(createdEntry);
+      }
+      return;
+    });
+};
+
+var updateTimeCard = function(timeCardId, cardToUpdate, successCallback, failureCallback) {
+    cardToUpdate.updatedTimestamp = Date.now();
+
+    // Since we are going to use person descriptor as lookup
+    // to perform the update, Mongo will complain about "_id"
+    // and/or "__v" being presented on the new model, so we
+    // have to clear those up.
+    delete cardToUpdate._id;
+    delete cardToUpdate.__v;
+
+    // [TODO]
+    // It is weird that we use both a findById and then another 
+    // findOneAndUpdated here. Though I could not find a much better
+    // way to achieve the need of both the before and the after documents
+    // of this update.
+    // If we found a better way here, this should be revised.
+    TimePunchCard
+    .findById(timeCardId, function(err, originalCard) {
+        if (err) {
+            if (failureCallback) {
+                failureCallback(err);
+            }
+            return;
+        }
+
+        TimePunchCard
+        .findOneAndUpdate(
+            {_id:timeCardId},
+            cardToUpdate,
+            function(err, resultCard) {
+          if (err) {
+            if (failureCallback) {
+                failureCallback(err);
+            }
+            return;
+          }
+
+          // Perform real time accrual, if appropriate
+          // For card update, this is to account for the diff between the original 
+          // and the updated cards
+          var originalWorkHours = getWorkHoursFromCard(originalCard);
+          var updatedWorkHours = getWorkHoursFromCard(resultCard);
+          if (originalWorkHours != null && updatedWorkHours != null) {
+            var diffWorkHours = updatedWorkHours - originalWorkHours;
+            TimeoffAccrualService.PerformHourlyAccrual(resultCard.employee.personDescriptor, diffWorkHours);
+          }
+
+          // Send the photo matching failure email if neccessary
+          if (isRecognitionFailed(resultCard)){
+            raisePunchCardRecognitionFailedEvent(resultCard);
+          }
+          
+          if (successCallback) {
+            successCallback(resultCard);
+          }
+
+          return;
+        });
+    });
+};
+
+var deleteTimeCard = function(timeCardId, successCallback, failureCallback) {
+    TimePunchCard.findByIdAndRemove(timeCardId, function(err, deletedCard) {
+        if (err) {
+          if (failureCallback) {
+            failureCallback(err);
+          }
+          return;
+        }
+
+        // Perform real time accrual, if appropriate
+        var workHours = getWorkHoursFromCard(deletedCard);
+        if (workHours) {
+            // We are to de-accrual the deleted card working hours
+            // This is assuming that the hours captures were accrued
+            // previously
+            workHours = workHours * -1.0;
+            TimeoffAccrualService.PerformHourlyAccrual(deletedCard.employee.personDescriptor, workHours);
+        }
+
+        if (successCallback) {
+            successCallback(deletedCard);
+        }
+        return;
+    });
 };
 
 var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
@@ -94,7 +216,7 @@ var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
 };
 
 var getWorkHoursFromCard = function(punchCard) {
-    if (punchCard.recordType != TimeoffTypes.WorkTime) {
+    if (punchCard.recordType != TimeCardTypes.WorkTime) {
         return 0.0;
     }
     return _getCardTimeSpanInHours(punchCard);
@@ -149,10 +271,64 @@ var raisePunchCardRecognitionFailedEvent = function(punchCard){
   AWSSNSPublisher.Publish(topicName, event.message);
 };
 
+var adjustTimeCardForTimeoffRecord = function(timeoffRecord) {
+    if (timeoffRecord.status == TimeoffStatus.Approved) {
+        _createTimeCardForApprovedTimeoffRecord(timeoffRecord);
+    } else if (timeoffRecord.status == TimeoffStatus.Revoked) {
+        _removeTimeCardForRevokedTimeoffRecord(timeoffRecord);
+    }
+};
+
+var _createTimeCardForApprovedTimeoffRecord = function(timeoffRecord) {
+    // For backward compatibility
+    if (!timeoffRecord.requestor.companyDescriptor) {
+        return;
+    }
+
+    var cardToCreate = {
+        date: timeoffRecord.startDateTime,
+        employee: {  
+            email : timeoffRecord.requestor.email,
+            firstName: timeoffRecord.requestor.firstName,
+            lastName: timeoffRecord.requestor.lastName,
+            personDescriptor: timeoffRecord.requestor.personDescriptor,
+            companyDescriptor: timeoffRecord.requestor.companyDescriptor
+        },
+        attributes: [],
+        start: timeoffRecord.startDateTime,
+        end: TimeoffService.getTimeoffEndDateTime(timeoffRecord),
+        inHours: true,
+        recordType: _TimeoffTypeToTimeCardTypeMap[timeoffRecord.type],
+        inProgress: false,
+        references: {
+            timeoffRecord: timeoffRecord._id
+        }
+    };
+
+    createTimeCard(cardToCreate);
+};
+
+var _removeTimeCardForRevokedTimeoffRecord = function(timeoffRecord) {
+    TimePunchCard
+        .find({'references.timeoffRecord': timeoffRecord._id})
+        .exec(function(err, timeCards) {
+            timeCards.forEach(function(timeCard) {
+                deleteTimeCard(timeCard._id);
+            });
+        });
+};
+
+var _TimeoffTypeToTimeCardTypeMap = {};
+_TimeoffTypeToTimeCardTypeMap[TimeoffTypes.Pto] = TimeCardTypes.PaidTimeOff;
+_TimeoffTypeToTimeCardTypeMap[TimeoffTypes.SickTime] = TimeCardTypes.SickTime;
 
 module.exports = {
+  createTimeCard: createTimeCard,
+  updateTimeCard: updateTimeCard,
+  deleteTimeCard: deleteTimeCard,
   parsePunchCardWithGeoCoordinate: parsePunchCardWithGeoCoordinate,
   getWorkHoursFromCard: getWorkHoursFromCard,
   isRecognitionFailed: isRecognitionFailed,
-  raisePunchCardRecognitionFailedEvent: raisePunchCardRecognitionFailedEvent
+  raisePunchCardRecognitionFailedEvent: raisePunchCardRecognitionFailedEvent,
+  adjustTimeCardForTimeoffRecord: adjustTimeCardForTimeoffRecord
 };
