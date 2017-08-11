@@ -2,6 +2,7 @@ var moment = require('moment');
 var TimePunchCard = require('../models/timePunchCard');
 var TimePunchCardService = require('../services/TimePunchCardService');
 var TimeoffAccrualService = require('../services/TimeoffAccrualService');
+var Logger = require('../services/monitoring/LoggingService');
 
 module.exports = function(app) {
 
@@ -111,6 +112,8 @@ module.exports = function(app) {
         // success callback
         TimePunchCardService.createTimeCard(parsed, 
             function(createdEntry) {
+                Logger.info('Test Message!!!!!');
+                Logger.error({a: 'b', c: { d: 1}});
                 res.json(createdEntry);
                 return;
             },
