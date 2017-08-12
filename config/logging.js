@@ -1,5 +1,3 @@
-var logEntriesLogger = require('le_node');
-
 var nodeEnv = process.env.NODE_ENV;
 
 ///////////////////////////////////////
@@ -53,31 +51,10 @@ if (nodeEnv == 'production') {
     };
 }
 
-var leLogger = new logEntriesLogger(leOptions);
-
 ///////////////////////////////////////
 // END: LogEntries Logger
 ///////////////////////////////////////
 
-var debug = function(message) {
-    leLogger.debug(message);
-};
-
-var info = function(message) {
-    leLogger.info(message);
-};
-
-var warning = function(message) {
-    leLogger.warning(message);
-};
-
-var error = function(message) {
-    leLogger.err(message);
-};
-
 module.exports = {
-    debug: debug,
-    info: info,
-    warning: warning,
-    error: error
+    logEntriesConfig : leOptions
 };

@@ -8,6 +8,10 @@ var methodOverride = require('method-override');
 var mongoose       = require('mongoose');
 var fs			       = require('fs');
 
+var winston = require('winston');
+var expressWinston = require('express-winston');
+var logger = require('./common/monitoring/Logging').winstonLogger;
+
 // configuration ===========================================
 
 // config files
@@ -47,12 +51,30 @@ app.use(express.static(__dirname + '/public'));
 // expose the bower components for easy references
 app.use('/bower_components',  express.static(__dirname + '/bower_components'));
 
+// request logging middleware
+expressWinston.requestWhitelist.push('body');
+expressWinston.responseWhitelist.push('body');
+
+var requestLoggerMiddleware = expressWinston.logger({
+    winstonInstance: logger,
+    meta: true, // optional: control whether you want to log the meta data about the request (default to true)
+    msg: "HTTP {{req.method}} {{req.url}}", // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
+    expressFormat: true // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
+});
+app.use(requestLoggerMiddleware);
+
 // routes ==================================================
 var routesPath = __dirname + '/app/routes';
 var routesFiles = fs.readdirSync(routesPath);
 routesFiles.forEach(function (file) {
   require(routesPath + '/' + file)(app)
 });
+
+// exception logging middleware
+var errorLoggerMiddleware = expressWinston.errorLogger({
+    winstonInstance: logger
+});
+app.use(errorLoggerMiddleware);
 
 // start app ===============================================
 // startup our app at http://localhost:8080

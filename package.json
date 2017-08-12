@@ -35,7 +35,9 @@
     "watchify": "~3.6.1",
     "mongoose-transaction": "0.0.3",
     "aws-sdk": "~2.48.0",
-    "le_node": "~1.7.1"
+    "le_node": "~1.7.1",
+    "winston": "~2.3.1",
+    "express-winston": "~2.4.0"
   },
   "browserify": {
     "transform": [
