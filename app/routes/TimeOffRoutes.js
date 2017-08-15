@@ -1,3 +1,4 @@
+var moment = require('moment');
 var emailService = require('../services/EmailService');
 var TimeoffAccrualService = require('../services/TimeoffAccrualService');
 var TimePunchCardService = require('../services/TimePunchCardService');
@@ -9,6 +10,26 @@ var TimeoffService = require('../services/TimeoffService');
 var TimeoffStatus = TimeoffService.TimeoffStatus;
 var TimeoffTypes = TimeoffService.TimeoffTypes;
 
+var _getDatesFromParam = function(paramQuery){
+    // Start Date
+    var dateRange = {};
+    var offset_mins = paramQuery.offset;
+    var startDateParam = paramQuery.start_date;
+    dateRange.startDate = startDateParam
+                    ? moment.utc(startDateParam).startOf('day')
+                    : moment.utc('1970-01-01').startOf('day');
+
+    var endDateParam = paramQuery.end_date;
+    dateRange.endDate = endDateParam
+                    ? moment.utc(endDateParam).endOf('day')
+                    : moment.utc('2270-01-01').endOf('day');
+
+    if(offset_mins){
+        dateRange.startDate = moment(dateRange.startDate).add(offset_mins, 'minutes');
+        dateRange.endDate = moment(dateRange.endDate).add(offset_mins, 'minutes');
+    }
+    return dateRange;
+};
 
 var applyApprovedRequestToBankedBalance = function(timeoffRequest) {
     if (timeoffRequest.status != TimeoffStatus.Approved) {
@@ -76,6 +97,29 @@ module.exports = function(app) {
             res.json(timeoffs);
         });
 
+    });
+
+    app.get('/api/v1/company/:company/timeoffs', function(req, res){
+        var company = req.params.company;
+        var dateRange = _getDatesFromParam(req.query);
+        Timeoff
+        .find({
+            'requestor.companyDescriptor': company,
+            'startDateTime': {
+                $gte: dateRange.startDate,
+                $lte: dateRange.endDate
+            }
+        })
+        .sort({startDateTime: 'desc'})
+        .exec(function(err, timeoffs){
+            if(err){
+                res.status(400).send(err);
+                return;
+            }
+
+            res.setHeader('Cache-Control', 'no-cache');
+            res.json(timeoffs);
+        });
     });
 
     app.post('/api/v1/timeoffs', function(req, res) {
