@@ -13,21 +13,16 @@ var TimeoffTypes = TimeoffService.TimeoffTypes;
 var _getDatesFromParam = function(paramQuery){
     // Start Date
     var dateRange = {};
-    var offset_mins = paramQuery.offset;
     var startDateParam = paramQuery.start_date;
     dateRange.startDate = startDateParam
-                    ? moment.utc(startDateParam).startOf('day')
+                    ? moment(startDateParam).startOf('day')
                     : moment.utc('1970-01-01').startOf('day');
 
     var endDateParam = paramQuery.end_date;
     dateRange.endDate = endDateParam
-                    ? moment.utc(endDateParam).endOf('day')
+                    ? moment(endDateParam).endOf('day')
                     : moment.utc('2270-01-01').endOf('day');
 
-    if(offset_mins){
-        dateRange.startDate = moment(dateRange.startDate).add(offset_mins, 'minutes');
-        dateRange.endDate = moment(dateRange.endDate).add(offset_mins, 'minutes');
-    }
     return dateRange;
 };
 
