@@ -156,7 +156,7 @@ module.exports = function(app) {
       TimePunchCardService.deleteTimeCard(
         id,
         function(deletedCard) {
-            res.json({ message: 'Successfully deleted' });
+            res.json(deletedCard);
             return;
         },
         function(error) {
