@@ -23,7 +23,7 @@ module.exports = function(app) {
 
     app.put('/api/v1/person/:descriptor/timeoff_quota', function(req, res){
         var personDescriptor = req.params.descriptor;
-        var newModel = req.body
+        var newModel = req.body;
 
         // Since we are going to use person descriptor as lookup
         // to perform the update, Mongo will complain about "_id"
@@ -93,7 +93,7 @@ module.exports = function(app) {
         // Initialize a transaction
         var transaction = new Transaction();
 
-        for (i=0; i < docCollection.length; i++) {
+        for (var i=0; i < docCollection.length; i++) {
             var doc = docCollection[i];
             if (doc._id) {
                 // Update
