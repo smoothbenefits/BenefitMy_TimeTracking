@@ -3,7 +3,7 @@ branch-defaults:
     environment: timetracking-prd
   development:
     environment: timetracking-dev
-  release-0.22.0:
+  release-0.23.0:
     environment: timetracking-stg
 global:
   application_name: TimeTrackingService
