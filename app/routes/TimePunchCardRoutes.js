@@ -1,7 +1,6 @@
 var moment = require('moment');
 var TimePunchCard = require('../models/timePunchCard');
 var TimePunchCardService = require('../services/TimePunchCardService');
-var TimeoffAccrualService = require('../services/TimeoffAccrualService');
 
 module.exports = function(app) {
 
@@ -115,7 +114,7 @@ module.exports = function(app) {
                 return;
             },
             function(error) {
-                res.status(400).send(err);
+                res.status(400).send(error);
                 return;
             }
         );
@@ -127,7 +126,7 @@ module.exports = function(app) {
 
     app.put('/api/v1/time_punch_cards/:id', function(req, res){
       var id = req.params.id;
-      var timePunchCardToUpdate = req.body
+      var timePunchCardToUpdate = req.body;
       
       TimePunchCardService.parsePunchCardWithGeoCoordinate(timePunchCardToUpdate, function(parsed) {
         // success callback
@@ -140,7 +139,7 @@ module.exports = function(app) {
                 return;
             },
             function(error) {
-                res.status(400).send(err);
+                res.status(400).send(error);
                 return;
             }
         );
@@ -160,7 +159,7 @@ module.exports = function(app) {
             return;
         },
         function(error) {
-            res.status(404).send(err);
+            res.status(404).send(error);
             return;
         }
       );
