@@ -67,7 +67,7 @@ app.use(requestLoggerMiddleware);
 var routesPath = __dirname + '/app/routes';
 var routesFiles = fs.readdirSync(routesPath);
 routesFiles.forEach(function (file) {
-  require(routesPath + '/' + file)(app)
+  require(routesPath + '/' + file)(app);
 });
 
 // exception logging middleware
