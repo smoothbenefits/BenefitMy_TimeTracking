@@ -1,16 +1,25 @@
 branch-defaults:
-  master:
-    environment: timetracking-prd
   development:
     environment: timetracking-dev
-  release-0.24.0:
+  master:
+    environment: timetracking-prd
+  release-0.25.0:
     environment: timetracking-stg
+deploy:
+  artifact: ./buildartifact.zip
+environment-defaults:
+  timetracking-stg:
+    branch: null
+    repository: null
 global:
   application_name: TimeTrackingService
   default_ec2_keyname: null
   default_platform: 64bit Amazon Linux 2015.09 v2.0.6 running Node.js
   default_region: us-west-2
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
   profile: eb-cli
   sc: git
-deploy:
-  artifact: ./buildartifact.zip
+  workspace_type: Application
