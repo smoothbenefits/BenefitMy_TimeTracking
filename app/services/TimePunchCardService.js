@@ -6,6 +6,7 @@ var AWSSNSPublisher = require('./aws/SNSPublisher');
 var AWSSNSUtilty = require('./aws/SNSUtility');
 var PunchCardRecognitionFailedEventFactory = require('./event_factories/PunchCardRecognitionFailedEventFactory');
 var TimePunchCard = require('../models/timePunchCard');
+var TimePunchCardSettingService = require('./TimePunchCardSettingService');
 
 // For some reason, the destructuring form does not work. We should figure out later
 // but not a priority for now.
@@ -19,7 +20,17 @@ var TimeCardTypes = {
     CompanyHoliday: 'Company Holiday',
     PaidTimeOff: 'Paid Time Off',
     SickTime: 'Sick Time',
-    PersonalLeave: 'Personal Leave'
+    PersonalLeave: 'Personal Leave',
+    BreakTime: 'Break Time'
+};
+
+var TimeCardTypeBehaviors = {
+  'Work Time': {NegativeValue: false, CountWorkingHours: true},
+  'Company Holiday': {NegativeValue: false, CountWorkingHours: false},
+  'Paid Time Off': {NegativeValue: false, CountWorkingHours: false},
+  'Sick Time': {NegativeValue: false, CountWorkingHours: false},
+  'Personal Leave': {NegativeValue: false, CountWorkingHours: false},
+  'Break Time': {NegativeValue: true, CountWorkingHours: true}
 };
 
 var createTimeCard = function(cardToCreate, successCallback, failureCallback) {
@@ -30,6 +41,10 @@ var createTimeCard = function(cardToCreate, successCallback, failureCallback) {
         }
         return;
       }
+
+      // After the entry is created, depending on the setting,
+      // create lunch time
+      CreateBreakTimeCardIfNecessary(createdEntry);
 
       // Perform real time accrual, if appropriate
       var workHours = getWorkHoursFromCard(createdEntry);
@@ -85,6 +100,10 @@ var updateTimeCard = function(timeCardId, cardToUpdate, successCallback, failure
             }
             return;
           }
+
+          // After the entry is edited, depending on the setting,
+          // create lunch time
+          CreateBreakTimeCardIfNecessary(resultCard);
 
           // Perform real time accrual, if appropriate
           // For card update, this is to account for the diff between the original 
@@ -216,10 +235,19 @@ var parsePunchCardWithGeoCoordinate = function(punchCard, success, error) {
 };
 
 var getWorkHoursFromCard = function(punchCard) {
-    if (punchCard.recordType != TimeCardTypes.WorkTime) {
-        return 0.0;
+    var hours = 0.0;
+    var behaviors = TimeCardTypeBehaviors[punchCard.recordType];
+    if (behaviors.CountWorkingHours){
+      hours = _getCardTimeSpanInHours(punchCard);
+      if(behaviors.NegativeValue){
+        return -hours;
+      }
+      else{
+        return hours;
+      }
     }
-    return _getCardTimeSpanInHours(punchCard);
+
+    return hours;
 };
 
 var _getCardTimeSpanInHours = function(punchCard) {
@@ -322,6 +350,75 @@ var _TimeoffTypeToTimeCardTypeMap = {};
 _TimeoffTypeToTimeCardTypeMap[TimeoffTypes.Pto] = TimeCardTypes.PaidTimeOff;
 _TimeoffTypeToTimeCardTypeMap[TimeoffTypes.SickTime] = TimeCardTypes.SickTime;
 
+/****************************************************************************
+* Begin Time Punch Card Lunch Hours services
+*****************************************************************************/
+var _getPunchCardMediumTimeOfDay = function(baseCard){
+  var durationInHours = _getCardTimeSpanInHours(baseCard);
+  var halfInHours = durationInHours/2;
+  return moment(baseCard.start).add(halfInHours, 'hours');
+};
+
+var _cloneAttributes = function(fromAttributes){
+  var toAttributes = [];
+  _.each(fromAttributes, function(attribute){
+    toAttributes.push(_.clone(attribute));
+  });
+  return toAttributes;
+};
+
+var CreateBreakTimeCardIfNecessary = function(baseCard){
+  var companyId = baseCard.employee.companyDescriptor;
+  var personId = baseCard.employee.personDescriptor;
+  if(baseCard.inHours ||
+     baseCard.inProgress ||
+     baseCard.recordType != TimeCardTypes.WorkTime
+    ){
+    return;
+  }
+  TimePunchCardSettingService.GetCompanyEmployeeSetting(
+    companyId,
+    personId,
+    function(setting){
+      if(setting.autoReportBreakTime.active &&
+        getWorkHoursFromCard(baseCard) > setting.autoReportBreakTime.breakTimeBaseWorkHours){
+        if(baseCard.references.breakCard){
+          //If we already have a break card, don't create new one
+          return;
+        }
+        var middleTime = _getPunchCardMediumTimeOfDay(baseCard);
+        var breakAddedTime = moment(middleTime).add(setting.autoReportBreakTime.breakTimeLengthHours * 60, 'm');
+        var clonedAttributes = _cloneAttributes(baseCard.attributes);
+        createTimeCard({
+            date: baseCard.date,
+            employee: _.clone(baseCard.employee),
+            attributes: clonedAttributes,
+            start: middleTime,
+            end: breakAddedTime,
+            inHours: true,
+            recordType: TimeCardTypes.BreakTime,
+            inProgress: false,
+            createdTimestamp: Date.now(),
+            updatedTimestamp: Date.now(),
+          },
+          function(createdCard){
+            baseCard.references.breakCard = createdCard._id;
+            baseCard.save();
+          },
+          function(){}
+        );
+      }
+    },
+    function(){
+      return;
+    });
+};
+
+/****************************************************************************
+* Time Punch Card Lunch Hours services ends
+*****************************************************************************/
+
+
 module.exports = {
   createTimeCard: createTimeCard,
   updateTimeCard: updateTimeCard,
@@ -330,5 +427,6 @@ module.exports = {
   getWorkHoursFromCard: getWorkHoursFromCard,
   isRecognitionFailed: isRecognitionFailed,
   raisePunchCardRecognitionFailedEvent: raisePunchCardRecognitionFailedEvent,
-  adjustTimeCardForTimeoffRecord: adjustTimeCardForTimeoffRecord
+  adjustTimeCardForTimeoffRecord: adjustTimeCardForTimeoffRecord,
+  createBreakTimeCardIfNecessary: CreateBreakTimeCardIfNecessary
 };
