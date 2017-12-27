@@ -178,7 +178,7 @@ module.exports = function(app) {
             timeoff.decisionTimestamp = Date.now();
             timeoff.save(function(err, savedTimeoff) {
                 if (err) {
-                    res.send(err);
+                    res.status(400).send(err);
                     return;
                 }
 
@@ -189,6 +189,24 @@ module.exports = function(app) {
                 emailService.sendTimeoffDecisionEmail(savedTimeoff);
 
                 TimePunchCardService.adjustTimeCardForTimeoffRecord(savedTimeoff);
+
+                res.setHeader('Cache-Control', 'no-cache');
+                res.json(savedTimeoff);
+            });
+        });
+    });
+
+    app.put('/api/v1/timeoffs/:id/company', function(req, res){
+        var id = req.params.id;
+        var company = req.body.requestor.companyDescriptor;
+
+        Timeoff.findById(id, function (err, timeoff) {
+            timeoff.requestor.companyDescriptor = company;
+            timeoff.save(function(err, savedTimeoff){
+                if(err){
+                    res.status(400).send(err);
+                    return;
+                }
 
                 res.setHeader('Cache-Control', 'no-cache');
                 res.json(savedTimeoff);
