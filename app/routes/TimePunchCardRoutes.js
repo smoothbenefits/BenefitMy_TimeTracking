@@ -164,4 +164,16 @@ module.exports = function(app) {
         }
       );
     });
+
+    app.post('/api/v1/time_punch_cards/unclosed_handle', function(req, res){
+        TimePunchCardService.handleUnclosedPunchCards(
+            function(count){
+                res.json({handled_count: count});
+                return;
+            },
+            function(err){
+                res.status(400).send(err);
+            }
+        );
+    });
 };
