@@ -11,10 +11,5 @@ module.exports = {
 
     mainAppSiteUrl : 'http://app.workbenefits.me/',
 
-    defaultPunchCardRecognitionConfidenceThreshold: 60,
-    // This is the hour of the day when we run the daily job
-    // stop all in-progress time cards from accruing hours. For
-    // example, if the setting has value of 8, it will get all
-    // in progress cards to stop accrue hours at 8 am UTC of the day
-    unclosedCardLimitHour: 8
+    defaultPunchCardRecognitionConfidenceThreshold: 60
 };

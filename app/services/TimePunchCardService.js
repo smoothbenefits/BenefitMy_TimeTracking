@@ -416,7 +416,7 @@ var CreateBreakTimeCardIfNecessary = function(baseCard){
 
 var handleUnclosedPunchCards = function(successCallback, failureCallback){
   // Set the checking time limit to be the certain hours the next day in UTC
-  var timeCardUnclosedTimeLimit = moment().utc().startOf('day').add(appSettings.unclosedCardLimitHour, 'h');
+  var timeCardUnclosedTimeLimit = moment();
   TimePunchCard.find(
     {
       end: null,
@@ -432,6 +432,7 @@ var handleUnclosedPunchCards = function(successCallback, failureCallback){
           //Set the end time to the setting's hour of next day of the card's starting date
           unclosed.end = moment();
           unclosed.systemStopped = true;
+          unclosed.inProgress = false;
           unclosed.save();
         });
       }
