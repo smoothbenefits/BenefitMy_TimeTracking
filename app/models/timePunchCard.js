@@ -60,5 +60,6 @@ module.exports = mongoose.model('TimePunchCard', {
     references: {
         timeoffRecord: { type: mongoose.Schema.Types.ObjectId, ref: 'Timeoff', required: false },
         breakCard: {type: mongoose.Schema.Types.ObjectId, ref: 'TimePunchCard', required: false }
-    }
+    },
+    systemStopped: { type: Boolean, default: false }
 });

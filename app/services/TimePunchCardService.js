@@ -414,6 +414,33 @@ var CreateBreakTimeCardIfNecessary = function(baseCard){
     });
 };
 
+var handleUnclosedPunchCards = function(successCallback, failureCallback){
+  // Set the checking time limit to be the certain hours the next day in UTC
+  var timeCardUnclosedTimeLimit = moment();
+  TimePunchCard.find(
+    {
+      end: null,
+      inHours: false,
+      recordType: TimeCardTypes.WorkTime,
+      start: {$lt: timeCardUnclosedTimeLimit}
+    }).exec(function(err, unclosedCards){
+      if(err){
+        failureCallback(err);
+      }
+      if(unclosedCards){
+        _.each(unclosedCards, function(unclosed){
+          //Set the end time to 8 hours later of the card's starting date
+          unclosed.end = moment(unclosed.start).add(8, 'h');
+          unclosed.systemStopped = true;
+          unclosed.inProgress = false;
+          unclosed.save();
+        });
+      }
+      successCallback(_.size(unclosedCards));
+    });
+
+};
+
 /****************************************************************************
 * Time Punch Card Lunch Hours services ends
 *****************************************************************************/
@@ -428,5 +455,6 @@ module.exports = {
   isRecognitionFailed: isRecognitionFailed,
   raisePunchCardRecognitionFailedEvent: raisePunchCardRecognitionFailedEvent,
   adjustTimeCardForTimeoffRecord: adjustTimeCardForTimeoffRecord,
-  createBreakTimeCardIfNecessary: CreateBreakTimeCardIfNecessary
+  createBreakTimeCardIfNecessary: CreateBreakTimeCardIfNecessary,
+  handleUnclosedPunchCards: handleUnclosedPunchCards
 };
