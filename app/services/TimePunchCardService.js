@@ -429,8 +429,8 @@ var handleUnclosedPunchCards = function(successCallback, failureCallback){
       }
       if(unclosedCards){
         _.each(unclosedCards, function(unclosed){
-          //Set the end time to the setting's hour of next day of the card's starting date
-          unclosed.end = moment();
+          //Set the end time to 8 hours later of the card's starting date
+          unclosed.end = moment(unclosedCards.start).add(8, 'h');
           unclosed.systemStopped = true;
           unclosed.inProgress = false;
           unclosed.save();
