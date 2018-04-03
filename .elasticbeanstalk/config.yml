@@ -3,7 +3,7 @@ branch-defaults:
     environment: timetracking-dev
   master:
     environment: timetracking-prd
-  release-0.28.0:
+  release-0.29.0:
     environment: timetracking-stg
 deploy:
   artifact: ./buildartifact.zip
