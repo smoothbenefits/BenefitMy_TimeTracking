@@ -13,7 +13,8 @@ module.exports = {
                 active: {type: Boolean, required: true, default: false},
                 breakTimeLengthHours: {type: Number, required: true, default: 0.5},
                 breakTimeBaseWorkHours: {type: Number, required: true, default: 6}
-            }
+            },
+            holidayEntitled: {type: Boolean}
         }
     }),
     IndividualTimePunchCardSetting: mongoose.model('IndividualTimePunchCardSetting', {
@@ -32,7 +33,8 @@ module.exports = {
                 active: {type: Boolean},
                 breakTimeLengthHours: {type: Number},
                 breakTimeBaseWorkHours: {type: Number}
-            }
+            },
+            holidayEntitled: {type:Boolean}
         }
     })
 };

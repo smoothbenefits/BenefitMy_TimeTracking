@@ -7,6 +7,8 @@ var combineSettings = function(companySettingModel, individualSettingModel){
     companySettingModel.setting.autoReportFullWeek);
   combined.autoReportBreakTime = _.defaults(individualSettingModel.setting.autoReportBreakTime,
     companySettingModel.setting.autoReportBreakTime);
+  combined.holidayEntitled = _.defaults(individualSettingModel.setting.holidayEntitled,
+    companySettingModel.setting.holidayEntitled);
   return combined;
 };
 

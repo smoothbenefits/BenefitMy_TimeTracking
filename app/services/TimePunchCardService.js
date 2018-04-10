@@ -438,12 +438,61 @@ var handleUnclosedPunchCards = function(successCallback, failureCallback){
       }
       successCallback(_.size(unclosedCards));
     });
-
 };
 
 /****************************************************************************
 * Time Punch Card Lunch Hours services ends
 *****************************************************************************/
+
+var generateHolidayCards = function(generateParam, callback){
+  var createdCardsList = [];
+  var remaining = 0;
+  _.each(generateParam, function(employeeData){
+    //We should check if the employee has holiday turned on
+    TimePunchCardSettingService.GetCompanyEmployeeSetting(
+      employeeData.companyDescriptor,
+      employeeData.personDescriptor,
+      function(setting){
+        if(setting.holidayEntitled){
+          //Let's construct the holiday card
+          var holidayCard = {
+            date: employeeData.date,
+            start: employeeData.date,
+            end: moment(employeeData.date).add(appSettings.defaultHolidayPunchCardHours, 'hours'),
+            recordType: TimeCardTypes.CompanyHoliday,
+            systemStopped: false,
+            updatedTimestamp: moment(),
+            createdTimestamp: moment(),
+            inHours: true,
+            attributes: [],
+            employee: {
+              personDescriptor: employeeData.personDescriptor,
+              firstName: employeeData.firstName,
+              lastName: employeeData.lastName,
+              email: employeeData.email,
+              companyDescriptor: employeeData.companyDescriptor
+            }
+          };
+          //actually create the holiday card
+          remaining += 1;
+          createTimeCard(holidayCard,
+            function(cardCreated){
+              createdCardsList.push(cardCreated);
+              remaining -= 1;
+              if(remaining <= 0){
+                callback(createdCardsList);
+              }
+          }, function(failure){
+            createdCardsList.push(failure);
+            remaining -= 1;
+              if(remaining <= 0){
+              callback(createdCardsList);
+            }
+          });
+        }
+      });
+  });
+};
 
 
 module.exports = {
@@ -456,5 +505,6 @@ module.exports = {
   raisePunchCardRecognitionFailedEvent: raisePunchCardRecognitionFailedEvent,
   adjustTimeCardForTimeoffRecord: adjustTimeCardForTimeoffRecord,
   createBreakTimeCardIfNecessary: CreateBreakTimeCardIfNecessary,
-  handleUnclosedPunchCards: handleUnclosedPunchCards
+  handleUnclosedPunchCards: handleUnclosedPunchCards,
+  generateHolidayCards: generateHolidayCards
 };
