@@ -479,13 +479,13 @@ var generateHolidayCards = function(generateParam, callback){
             function(cardCreated){
               createdCardsList.push(cardCreated);
               remaining -= 1;
-              if(remaining <= 0){
+              if(remaining == 0){
                 callback(createdCardsList);
               }
           }, function(failure){
             createdCardsList.push(failure);
             remaining -= 1;
-              if(remaining <= 0){
+            if(remaining == 0){
               callback(createdCardsList);
             }
           });
