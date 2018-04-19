@@ -14,7 +14,9 @@ module.exports = {
                 breakTimeLengthHours: {type: Number, required: true, default: 0.5},
                 breakTimeBaseWorkHours: {type: Number, required: true, default: 6}
             },
-            holidayEntitled: {type: Boolean}
+            autoHolidayCardGeneration: {
+                active: {type: Boolean}
+            }
         }
     }),
     IndividualTimePunchCardSetting: mongoose.model('IndividualTimePunchCardSetting', {
@@ -34,7 +36,9 @@ module.exports = {
                 breakTimeLengthHours: {type: Number},
                 breakTimeBaseWorkHours: {type: Number}
             },
-            holidayEntitled: {type:Boolean}
+            autoHolidayCardGeneration: {
+                active: {type: Boolean}
+            }
         }
     })
 };

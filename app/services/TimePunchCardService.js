@@ -1,5 +1,6 @@
 var _ = require('underscore');
 var moment = require('moment');
+var uuidv4 = require('uuid/v4');
 var LocationService = require('./LocationService');
 var appSettings = require('../settings/appSettings');
 var AWSSNSPublisher = require('./aws/SNSPublisher');
@@ -446,14 +447,15 @@ var handleUnclosedPunchCards = function(successCallback, failureCallback){
 
 var generateHolidayCards = function(generateParam, callback){
   var createdCardsList = [];
-  var remaining = 0;
+  var remaining = generateParam.length;
+  var batchNumber = uuidv4();
   _.each(generateParam, function(employeeData){
     //We should check if the employee has holiday turned on
     TimePunchCardSettingService.GetCompanyEmployeeSetting(
       employeeData.companyDescriptor,
       employeeData.personDescriptor,
       function(setting){
-        if(setting.holidayEntitled){
+        if(setting.autoHolidayCardGeneration && setting.autoHolidayCardGeneration.active){
           //Let's construct the holiday card
           var holidayCard = {
             date: employeeData.date,
@@ -471,10 +473,12 @@ var generateHolidayCards = function(generateParam, callback){
               lastName: employeeData.lastName,
               email: employeeData.email,
               companyDescriptor: employeeData.companyDescriptor
+            },
+            systemGenerated: {
+              batchId: batchNumber
             }
           };
           //actually create the holiday card
-          remaining += 1;
           createTimeCard(holidayCard,
             function(cardCreated){
               createdCardsList.push(cardCreated);
@@ -489,6 +493,12 @@ var generateHolidayCards = function(generateParam, callback){
               callback(createdCardsList);
             }
           });
+        }
+        else{
+          remaining -= 1;
+        }
+        if (remaining == 0){
+          callback(createdCardsList);
         }
       });
   });

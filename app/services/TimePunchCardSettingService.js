@@ -3,12 +3,14 @@ var TimePunchCardSetting = require('../models/timePunchCardSetting');
 
 var combineSettings = function(companySettingModel, individualSettingModel){
   var combined = {};
+  console.log("before combine");
   combined.autoReportFullWeek = _.defaults(individualSettingModel.setting.autoReportFullWeek,
     companySettingModel.setting.autoReportFullWeek);
   combined.autoReportBreakTime = _.defaults(individualSettingModel.setting.autoReportBreakTime,
     companySettingModel.setting.autoReportBreakTime);
-  combined.holidayEntitled = _.defaults(individualSettingModel.setting.holidayEntitled,
-    companySettingModel.setting.holidayEntitled);
+  combined.autoHolidayCardGeneration = _.defaults(individualSettingModel.setting.autoHolidayCardGeneration,
+    companySettingModel.setting.autoHolidayCardGeneration);
+  console.log("combined");
   return combined;
 };
 
