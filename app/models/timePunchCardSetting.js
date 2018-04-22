@@ -13,6 +13,9 @@ module.exports = {
                 active: {type: Boolean, required: true, default: false},
                 breakTimeLengthHours: {type: Number, required: true, default: 0.5},
                 breakTimeBaseWorkHours: {type: Number, required: true, default: 6}
+            },
+            autoHolidayCardGeneration: {
+                active: {type: Boolean}
             }
         }
     }),
@@ -32,6 +35,9 @@ module.exports = {
                 active: {type: Boolean},
                 breakTimeLengthHours: {type: Number},
                 breakTimeBaseWorkHours: {type: Number}
+            },
+            autoHolidayCardGeneration: {
+                active: {type: Boolean}
             }
         }
     })
