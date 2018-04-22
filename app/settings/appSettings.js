@@ -11,5 +11,7 @@ module.exports = {
 
     mainAppSiteUrl : 'http://app.workbenefits.me/',
 
-    defaultPunchCardRecognitionConfidenceThreshold: 60
+    defaultPunchCardRecognitionConfidenceThreshold: 60,
+
+    defaultHolidayPunchCardHours: 8
 };

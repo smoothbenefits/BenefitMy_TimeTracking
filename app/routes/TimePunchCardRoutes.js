@@ -176,4 +176,15 @@ module.exports = function(app) {
             }
         );
     });
+
+    app.post('/api/v1/time_punch_cards/generate_holidays', function(req, res){
+        var generateParameters = req.body;
+        TimePunchCardService.generateHolidayCards(
+            generateParameters,
+            function(cardsCreated){
+                res.json(cardsCreated);
+                return;
+            }
+        );
+    });
 };

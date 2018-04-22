@@ -61,5 +61,8 @@ module.exports = mongoose.model('TimePunchCard', {
         timeoffRecord: { type: mongoose.Schema.Types.ObjectId, ref: 'Timeoff', required: false },
         breakCard: {type: mongoose.Schema.Types.ObjectId, ref: 'TimePunchCard', required: false }
     },
-    systemStopped: { type: Boolean, default: false }
+    systemStopped: { type: Boolean, default: false },
+    systemGenerated: {
+        batchId: { type: String }
+    }
 });
