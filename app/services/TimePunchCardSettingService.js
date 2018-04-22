@@ -5,13 +5,6 @@ var combineSettings = function(companySettingModel, individualSettingModel){
   var combined = _.defaults(
     individualSettingModel.setting,
     companySettingModel.setting);
-  var combined = {};
-  combined.autoReportFullWeek = _.defaults(individualSettingModel.setting.autoReportFullWeek,
-    companySettingModel.setting.autoReportFullWeek);
-  combined.autoReportBreakTime = _.defaults(individualSettingModel.setting.autoReportBreakTime,
-    companySettingModel.setting.autoReportBreakTime);
-  combined.autoHolidayCardGeneration = _.defaults(individualSettingModel.setting.autoHolidayCardGeneration,
-    companySettingModel.setting.autoHolidayCardGeneration);
   return combined;
 };
 
