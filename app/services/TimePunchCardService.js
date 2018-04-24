@@ -380,7 +380,8 @@ var CreateBreakTimeCardIfNecessary = function(baseCard){
   TimePunchCardSettingService.GetCompanyEmployeeSetting(
     companyId,
     personId,
-    function(setting){
+    function(employeeSetting){
+      var setting = employeeSetting.setting;
       if(setting.autoReportBreakTime.active &&
         getWorkHoursFromCard(baseCard) > setting.autoReportBreakTime.breakTimeBaseWorkHours){
         if(baseCard.references.breakCard){
