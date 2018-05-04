@@ -86,7 +86,7 @@ var getCompanyEmployeeSetting = function(companyId, personId, successCallback, f
     // Convert Mongoose document to a plain object, or underscore
     // functions might not work. e.g. _.clone returns undefined...
     companyTimePunchCardSetting = companyTimePunchCardSetting.toObject();
-  
+
     TimePunchCardSetting.IndividualTimePunchCardSetting
     .findOne({'personDescriptor': personId})
     .exec(function(err, individualTimePunchCardSetting){
@@ -104,11 +104,9 @@ var getCompanyEmployeeSetting = function(companyId, personId, successCallback, f
         // functions might not work. e.g. _.clone returns undefined...
         individualTimePunchCardSetting = individualTimePunchCardSetting.toObject();
       }
-
       var flattenedSetting = flattenIndividualWithCompany(
             companyTimePunchCardSetting,
             individualTimePunchCardSetting); 
-
       successCallback(flattenedSetting);
       return; 
     });
