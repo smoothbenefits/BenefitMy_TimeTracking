@@ -455,8 +455,8 @@ var generateHolidayCards = function(generateParam, callback){
     TimePunchCardSettingService.GetCompanyEmployeeSetting(
       employeeData.companyDescriptor,
       employeeData.personDescriptor,
-      function(setting){
-        if(setting.autoHolidayCardGeneration && setting.autoHolidayCardGeneration.active){
+      function(settingResult){
+        if(settingResult.setting.autoHolidayCardGeneration && settingResult.setting.autoHolidayCardGeneration.active){
           //Let's construct the holiday card
           var holidayCard = {
             date: employeeData.date,
